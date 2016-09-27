@@ -1,14 +1,16 @@
-package de.dlh.smile.axdelivery.Model
+package de.dlh.smile.axdelivery.DestinationModel
 
 import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
-import org.joda.time.DateTime
+import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
 
 object Transformations {
 
   def formatAndRegisterDataFrame(df: DataFrame, tableName: String): DataFrame = {
-    df.registerTempTable(tableName)
+    df.filterPartitionFieldsOneYearFrom()
+      .filterValueMapEquals("cs_uri_query","Screen","FOFP")
+
+    /*df.registerTempTable(tableName)
     Contexts.sqlCtx.sql(
       s"""
     select
@@ -31,17 +33,9 @@ object Transformations {
         day,
         session_guid
     from $tableName
-    where cs_uri_query['Screen'] = 'FOFP'
-      """)
+      """)*/
   }
 
-  def filterDates(df: DataFrame, year: Int, month: Int): DataFrame = {
-    /*val month = DateTime.now().getMonthOfYear
-    val year = DateTime.now().getYear*/
-    val dfFiltered = df.filter(
-      (col("year") === year and col("month") <= month) or
-        (col("year") === (year - 1) and col("month") > month)
-    )
-    dfFiltered
-  }
+
+
 }
