@@ -17,10 +17,10 @@ class TransformationsTest extends FlatSpec with Matchers {
     dfResult.printSchema()
   }
 
-  "filterFromMap" should "filter dataframe based on a Map column key and value" in {
+/*  "filterFromMap" should "filter dataframe based on a Map column key and value" in {
     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data").getPath)
     df.filterValueMapEquals("cs_uri_query", "Screen", "FOFP")
-  }
+  }*/
 
   "formatAndRenameDataFrame" should "format the dataframe as expected" in {
     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data").getPath)
@@ -30,13 +30,13 @@ class TransformationsTest extends FlatSpec with Matchers {
     val dfResult = Transformations.formatAndRegisterDataFrame(df).filter(col("BFTuDep")!== null)
     dfResult.show
   }
-
+/*
   "filterByDate" should "filter dataframe based on dates" in {
     val df = Stub.dfFilterDate
     val dfResult = df.filterPartitionFieldsOneYearFrom(2016, 9)
     dfResult.count() should equal(2)
   }
-
+*/
   it should "test" in {
     val date = DateTime.now.getMonthOfYear
     println(date)
