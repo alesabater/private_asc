@@ -1,19 +1,20 @@
-package de.dlh.smile.axdelivery
+package de.dlh.smile.axdelivery.DestinationModel
 
+import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
+import de.dlh.smile.axdelivery.Stub
 import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.functions._
 import org.joda.time.DateTime
-import org.scalatest.{FlatSpec, Matchers}
-import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
-import de.dlh.smile.axdelivery.DestinationModel.Transformations
 import org.joda.time.format.DateTimeFormat
+import org.scalatest.{FlatSpec, Matchers}
 
 class TransformationsTest extends FlatSpec with Matchers {
 
   "execute" should "run the complete program" in {
     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data").getPath)
-    println(df.select(col("cs_uri_query")).take(1)(0).getMap(0))
-    df.printSchema()
+    val dfResult = Transformations.formatAndRegisterDataFrame(df)
+    dfResult.show()
+    dfResult.printSchema()
   }
 
   "filterFromMap" should "filter dataframe based on a Map column key and value" in {
@@ -26,7 +27,7 @@ class TransformationsTest extends FlatSpec with Matchers {
     df.show()
     val tableName = "weblogs"
 
-    val dfResult = Transformations.formatAndRegisterDataFrame(df, tableName).filter(col("BFTuDep")!== null)
+    val dfResult = Transformations.formatAndRegisterDataFrame(df).filter(col("BFTuDep")!== null)
     dfResult.show
   }
 

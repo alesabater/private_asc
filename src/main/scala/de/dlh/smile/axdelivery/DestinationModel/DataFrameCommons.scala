@@ -4,31 +4,51 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.joda.time.DateTime
 import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
+import org.apache.spark.sql.types.StringType
+
+import scala.util.{Failure, Success, Try}
 
 object DataFrameCommons {
   // DataFrame Conversions
-  implicit def dataFrame2upgradable(df: DataFrame): Updatable = Updatable(df)
-  implicit def upgradable2dataFrame(up: Updatable): DataFrame = up.df
+  implicit def dataFrame2dataFrameUpdatable(df: DataFrame): DataFrameUpdatable = DataFrameUpdatable(df)
+
+  implicit def dataFrameUpdatable2dataFrame(up: DataFrameUpdatable): DataFrame = up.df
 }
 
-case class Updatable(df: DataFrame) {
+case class DataFrameUpdatable(df: DataFrame) {
 
   import DataFrameCommons._
 
-  def filterValueMapEquals(column: String, key: String, value: String): Updatable = {
+  def filterValueMapEquals(column: String, key: String, value: String): DataFrameUpdatable = {
     df.filter(col(column).getItem(key) === value)
   }
 
-  def filterPartitionFieldsOneYearFrom(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): Updatable = {
+  def filterPartitionFieldsOneYearFrom(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): DataFrameUpdatable = {
     df.filter(
       (col("year") === year and col("month") <= month) or
         (col("year") === (year - 1) and col("month") > month)
     )
   }
 
-  def getBFTUDEPField(columnDate: String, columnMap: String, key: String, format: String = "yyyyMMdd"): Updatable = {
-    df.withColumn("dateTmp", dateFrom(col(columnMap).getItem(key) ,lit(format)))
-      .withColumn("BFTUDEP", datediff(to_date(col("dateTmp")),to_date(col(columnDate))))
+  def getBFTUDEPField(columnDate: String, columnMap: String, key: String, format: String = "yyyyMMdd"): DataFrameUpdatable = {
+    df.withColumn("dateTmp", dateFrom(col(columnMap).getItem(key), lit(format)))
+      .withColumn("BFTuDep", datediff(to_date(col("dateTmp")), to_date(col(columnDate))))
   }
 
+  def flatMapType(columnMap: String, keys: List[String]): DataFrame = {
+    val udf1 = udf[Option[String], Map[String, String], String]((map: Map[String, String], key: String) => {
+      val mapNoNulls = map.filter(_._2 != null)
+      if (mapNoNulls.contains(key)) Try(mapNoNulls.get(key)) match {
+        case Success (s) => s;
+        case Failure (f) => None
+      } else None
+    })
+    if (df.columns.contains(columnMap)) {
+      keys.foldLeft(df) {
+        (data, key) =>
+          data.withColumn(key, udf1(df(columnMap), lit(key)))
+      }.drop(columnMap)
+    }
+    else df
+  }
 }
