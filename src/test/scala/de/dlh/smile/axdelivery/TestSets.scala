@@ -7,6 +7,8 @@ import org.apache.spark.sql.types._
 object Stub {
   val dfFilterDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateFilterSeq), Schemas.dateFilterSchema)
   val dfStringDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateStringSeq), Schemas.dateStringSchema)
+  val dfStringIATA = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.IATAStringSeq), Schemas.IATAStringSchema)
+  val dfStringOrigin = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.originStringSeq), Schemas.IATAStringSchema)
   val dfMapDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateMapSeq), Schemas.dateMapSchema)
 }
 
@@ -22,6 +24,21 @@ object TestSets {
     Row("20160926"),
     Row(null),
     Row("Invalid date")
+  )
+  
+  val IATAStringSeq = Seq(
+    Row("MAD;FRA;jkh"),
+    Row("BCN"),
+    Row(null),
+    Row("MAD%3D;FRA")
+  )
+  
+  val originStringSeq = Seq(
+    Row("MAD"),
+    Row("BCN"),
+    Row(null),
+    Row("FAKE"),
+    Row("CCS")
   )
 
   val dateMapSeq = Seq(
@@ -45,6 +62,10 @@ object Schemas {
 
   val dateStringSchema = StructType(Seq(
     StructField("date", StringType, true)
+  ))
+  
+  val IATAStringSchema = StructType(Seq(
+    StructField("BFO", StringType, true)
   ))
 
   val dateMapSchema = StructType(Seq(

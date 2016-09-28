@@ -25,5 +25,6 @@ object LoadedProperties {
 
   def fromMapColumns = recommendation_conf.getStringList("dataframe.select.map_columns").toList
   def webtrendsColumns = recommendation_conf.getStringList("dataframe.select.webtrends").toList
-
+  def originCities = recommendation_conf.getStringList("originCities").toList
+  
 }

@@ -33,4 +33,10 @@ object ColumnCommons extends Enumeration with Logging {
   }
 
   val dateFrom = udf((dateString: String, format: String) => createDateFrom(dateString, format))
+  
+  val getFirstIATA = udf((iataString: String) => iataString match {
+    case null => None
+    case _ => Some(iataString.substring(0, 3))
+  }
+  )
 }

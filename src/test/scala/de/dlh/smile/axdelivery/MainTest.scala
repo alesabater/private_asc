@@ -4,10 +4,12 @@ import de.dlh.smile.engine.commons.Contexts
 import org.scalatest.{FlatSpec, Matchers}
 
 class MainTest extends FlatSpec with Matchers {
-
-  "read airport codes" should "read airport codes from a JSON" in {
-    val json = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
-    json.show()
-    json.printSchema()
+  
+  "execute" should "run the complete program" in {
+    val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
+    val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
+    val dfResult = Transformations.formatAndRegisterDataFrame(df, dfAirportMap)
+    dfResult.show()
+    dfResult.printSchema()
   }
 }

@@ -5,6 +5,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
+import de.dlh.smile.engine.commons.Contexts
 
 class DataFrameCommonsTest extends FlatSpec with Matchers {
 
@@ -20,6 +21,7 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
   "flatMapType" should "flat desired keys with their values out of a Map Column" in {
     val df = Stub.dfMapDate
     val dfResult = df.flatMapType("date_dep", List("k1", "k2"))
+    dfResult.show
     dfResult.columns should equal (Array("date_prev", "k1", "k2"))
     dfResult.select(col("k1")).take(7).filter( row => row.getString(0) != null).length should equal(5)
     dfResult.select(col("k1")).take(7).filter( row => row.getString(0) == null).length should equal(2)

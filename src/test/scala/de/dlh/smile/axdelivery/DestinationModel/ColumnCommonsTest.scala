@@ -4,6 +4,7 @@ import de.dlh.smile.axdelivery.{Stub, TestSets}
 import org.scalatest.{FlatSpec, Matchers}
 import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.Row
 
 class ColumnCommonsTest extends FlatSpec with Matchers {
 
@@ -21,13 +22,18 @@ class ColumnCommonsTest extends FlatSpec with Matchers {
   }
 */
 
-  "dateFrom1" should "get the specified segment of the date from a String date" in {
+  "dateFrom" should "get the specified segment of the date from a String date" in {
     val df = Stub.dfStringDate
     val dfResult = df.withColumn("date", dateFrom(col("date"), lit("yyyyMMdd")))
 
     dfResult.show
   }
 
+  "getFirstIATA" should "get the first IATA code from the IATA string" in {
+	  val df = Stub.dfStringIATA
+    val dfResult = df.withColumn("BFO", getFirstIATA(col("BFO")))
+    dfResult.collect() should equal(Array(Row("MAD"), Row("BCN"), Row(null), Row("MAD")))
+  }
 
 
 }
