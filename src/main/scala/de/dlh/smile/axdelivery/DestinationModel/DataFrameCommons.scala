@@ -46,7 +46,7 @@ case class DataFrameUpdatable(df: DataFrame) {
 			if (df.columns.contains(columnMap)) {
 				keys.foldLeft(df) {
 					(data, key) =>
-					data.withColumn(key, udf1(df(columnMap), lit(key)))
+					data.withColumn(key.replace(".", ""), udf1(df(columnMap), lit(key)))
 				}.drop(columnMap)
 			}
 			else df
@@ -54,5 +54,9 @@ case class DataFrameUpdatable(df: DataFrame) {
 
 	def airportToCityCode(dfAirportMap: DataFrame, colName: String): DataFrame = {
 			df.join(dfAirportMap, df(colName) === dfAirportMap("Airport"), "left").drop("Airport").drop(colName).withColumnRenamed("City", colName)
+	}
+	
+	def reshapeOutput(df: DataFrame): DataFrame = {
+	  
 	}
 }
