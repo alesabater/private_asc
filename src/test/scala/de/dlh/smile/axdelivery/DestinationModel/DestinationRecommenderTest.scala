@@ -14,7 +14,10 @@ class DestinationRecommenderTest extends FlatSpec with Matchers {
       val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
       val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
       val dfResult = DestinationRecommender.getRecommendedDestinations(
-          MovingAverage.getMovingAverage(Transformations.formatAndRegisterDataFrame(df, dfAirportMap)))       
+          MovingAverage.getMovingAverage(
+              Transformations.formatAndRegisterDataFrame(df, dfAirportMap)
+              )
+          )       
       dfResult.show
   }
 }

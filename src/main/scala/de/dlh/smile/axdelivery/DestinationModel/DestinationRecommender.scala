@@ -22,8 +22,11 @@ object DestinationRecommender {
     val dfRankedByOnD = dfRankedByO
       .withColumn("monthrank", rank over byOnD)
 
-    // it would be convenient to keep here the only month that we are interested in order to reduce computation time
-    val dfRankedPredictionMonth = dfRankedByOnD.filterPartitionFieldsOneMonth(2015, 11)
+    // It is convenient to keep here the only month that we are interested in order to reduce computation time
+    val year = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("year")).first().getInt(0)
+		val month = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("month")).first().getInt(0)
+    val dfRankedPredictionMonth = dfRankedByOnD.filterPartitionFieldsOneMonth(year, month)
+    
     // Compute the model rank as a combination of the previous two & filter keeping only the top 16
     val dfResultScoring = dfRankedPredictionMonth.select(col("BFO"), col("BFD"), col("year"), col("month"), (col("rank") + col("monthrank") * col("monthrank")).alias("mdlrank"))
     val byOriginMdlRank = Window
