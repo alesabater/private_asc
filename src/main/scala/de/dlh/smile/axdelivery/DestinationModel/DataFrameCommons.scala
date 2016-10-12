@@ -55,8 +55,5 @@ case class DataFrameUpdatable(df: DataFrame) {
 	def airportToCityCode(dfAirportMap: DataFrame, colName: String): DataFrame = {
 			df.join(dfAirportMap, df(colName) === dfAirportMap("Airport"), "left").drop("Airport").drop(colName).withColumnRenamed("City", colName)
 	}
-	
-	def reshapeOutput(df: DataFrame): DataFrame = {
-	  
-	}
+
 }

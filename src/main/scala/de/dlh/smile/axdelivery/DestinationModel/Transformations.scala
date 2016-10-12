@@ -7,7 +7,6 @@ import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
 import de.dlh.smile.axdelivery.LoadedProperties
 import org.apache.spark.sql.functions._
 import de.dlh.smile.engine.commons._
-//import de.dlh.smile.engine.commons.Contexts
 
 object Transformations {
 
@@ -23,6 +22,9 @@ object Transformations {
       .airportToCityCode(dfAirportMap, "BFD")
   }
   
+  def filterRT(df: DataFrame): DataFrame = {
+    df.filter("BFTripType = 'RT'").filter("BFO <> 'null'").filter("BFD <> 'null'")
+  }
   
   def filterOrigin(df: DataFrame): DataFrame = {
     df.filter(col("BFO").isin(LoadedProperties.originCities: _*))

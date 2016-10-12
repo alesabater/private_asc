@@ -40,4 +40,11 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
 				df.count()
 				df.show
 	}
+	
+	"airportToCityCode" should "overwrite the airport codes with city codes" in {
+	  val df = Stub.dfWebtendsAfterFormat
+	  val dfAirportMap = Stub.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
+	  val dfResult = df.airportToCityCode(dfAirportMap, "BFO")
+	  dfResult.show()
+	}
 }

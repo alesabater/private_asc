@@ -4,6 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 
+
 object MovingAverage {
   def getMovingAverage(df: DataFrame): DataFrame = {
     // Compute number of searches per OnD, year and month
@@ -28,25 +29,4 @@ object MovingAverage {
            )
    dfResult
   }
-  //// Compute number of searches per OnD, year and month
-//
-//
-//
-//// Compute the moving average 1/4, 1/2, 1/4
-//var windowSpec = Window.partitionBy('BFO, 'BFD).orderBy('month).rangeBetween(-1, 1)
-//var moving_average = sum('freq).over(windowSpec)
-//val data =
-//aggregated.select(
-//    'BFO,
-//    'BFD,
-//    'year,
-//    'month,
-//    'freq,
-//    moving_average.alias("smoothedfreq")).select(
-//    'BFO,
-//    'BFD,
-//    'year,
-//    'month,
-//    (('smoothedfreq + 'freq /3) * 3/4).alias("freq")
-//)
 }
