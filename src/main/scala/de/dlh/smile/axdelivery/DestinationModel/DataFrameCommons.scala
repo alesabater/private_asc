@@ -31,7 +31,7 @@ case class DataFrameUpdatable(df: DataFrame) {
 	}
 
 	def getBFTUDEPField(columnDate: String, columnMap: String, key: String, format: String = "yyyyMMdd"): DataFrameUpdatable = {
-			df.withColumn("dateTmp", dateFrom(col(columnMap).getItem(key), lit(format)))
+			df.withColumn("dateTmp", udfCreateDateFrom(col(columnMap).getItem(key), lit(format), lit(format)))
 			.withColumn("BFTuDep", datediff(to_date(col("dateTmp")), to_date(col(columnDate))))
 	}
 
@@ -55,5 +55,5 @@ case class DataFrameUpdatable(df: DataFrame) {
 	def airportToCityCode(dfAirportMap: DataFrame, colName: String): DataFrame = {
 			df.join(dfAirportMap, df(colName) === dfAirportMap("Airport"), "left").drop("Airport").drop(colName).withColumnRenamed("City", colName)
 	}
-
+	
 }
