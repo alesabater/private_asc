@@ -6,7 +6,47 @@ import org.apache.spark.sql.functions._
 import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
 
 object DestinationRecommender {
-    def getMovingAverage(df: DataFrame): DataFrame = {
+  
+  def scaleWithPreviousYear(df: DataFrame): DataFrame = {
+    // this should be applied before the smoothing
+    // Before doing the ranking, we scale the searches based on last year same month
+    val year = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("year")).first().getInt(0)
+		val month = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("month")).first().getInt(0)
+    val currentMonth = df.filter((col("year") === year + 1) and (col("month") === month))
+      .select(col("BFO").alias("current_BFO"),
+          col("BFD").alias("current_BFD"),
+          col("year").alias("current_year"),
+          col("month").alias("current_month"),
+          col("freq").alias("current_freq")) 
+    val lastYearMonth = df.filter((col("year") === year) and (col("month") === month))
+      .select(col("BFO").alias("last_BFO"),
+          col("BFD").alias("last_BFD"),
+          col("year").alias("last_year"),
+          col("month").alias("last_month"),
+          col("freq").alias("last_freq"))
+    val yearFactor = currentMonth.join(lastYearMonth,
+        (currentMonth("current_BFO") === lastYearMonth("last_BFO")) and (currentMonth("current_BFD") === lastYearMonth("last_BFD")),
+        "inner")
+        .select(col("current_BFO").alias("factor_BFO"),
+            col("current_BFD").alias("factor_BFD"),
+            (col("current_freq")/col("last_freq")).alias("factor"),
+            col("last_year").alias("factor_year"))
+    
+    val dfResult = df
+      .filter((col("year") !== year) or (col("month") !== month))
+      .join(yearFactor,
+        (df("year") === yearFactor("factor_year")) and (df("BFO") === yearFactor("factor_BFO")) and (df("BFD") === yearFactor("factor_BFD")),
+        "left")
+        .select(col("BFO"), 
+            col("BFD"), 
+            col("year"), 
+            col("month"), 
+            col("freq"), 
+            col("factor"),
+            (col("freq") * coalesce(col("factor"), lit(1))).alias("freq_scaled"))    
+   dfResult
+  }
+  def getMovingAverage(df: DataFrame): DataFrame = {
     // Compute number of searches per OnD, year and month
     val dfTmp = df
       .select("BFO", "BFD", "year", "month", "session_guid")
@@ -40,31 +80,6 @@ object DestinationRecommender {
   }
     
   def getRecommendedDestinations(df: DataFrame) : DataFrame = {
-    // this should be done before the smoothing
-    // Before doing the ranking, we scale the searches based on last year same month
-//    val yearToday = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("year")).first().getInt(0)
-//		val monthToday = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("month")).first().getInt(0)
-//    val currentMonth = df.filter((col("year") === yearToday) and (col("month") === monthToday))
-//    val lastYearMonth = df.filter((col("year") === yearToday - 1) and (col("month") === monthToday))
-//    val yearFactor = currentMonth.join(lastYearMonth,
-//        (currentMonth("BFO") === lastYearMonth("BFO")) and (currentMonth("BFD") === lastYearMonth("BFD")),
-//        "inner")
-//        .select(col("currentMonth.BFO"),
-//            col("currentMonth.BFD"),
-//            col("currentMonth.freq")/col("lastYearMonth.freq").alias("factor"),
-//            col("lastYearMonth.year"))
-//    
-//    val dfScaled = df
-//      .filter((col("year") !== yearToday-1) or (col("month") !== monthToday))
-//      .join(yearFactor,
-//        (df("year") === yearFactor("year")) and (df("BFO") === yearFactor("BFO")) and (df("BFD") === yearFactor("BFD")),
-//        "left").select(col("BFO"), 
-//            col("BFD"), 
-//            col("year"), 
-//            col("month"), 
-//            col("freq"), 
-//            (col("freq") * col("factor")).alias("freq_scaled"))
-        
     // Compute the rank and keep up to rank 50
     val byOrigin = Window
       .partitionBy(col("BFO"), col("year"), col("month"))
