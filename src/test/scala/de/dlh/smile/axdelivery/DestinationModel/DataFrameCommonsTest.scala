@@ -59,4 +59,13 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
 		val dfResult = df.filterOrigin()
 		dfResult.collect() should equal(Array(Row("MAD"),Row("BCN")))
 	}
+	
+  "filterOneMonth" should "filter dataframe based on dates and keep only one month" in {
+		val df = Stub.dfFilterDate
+		// we should actually keep the very old month of the data or year-1 and month+1
+		val dfResult = df.filterPartitionFieldsOneMonth(2016, 9)
+		df.show()
+		dfResult.show()
+		//dfResult.count() should equal(2)
+	}
 }

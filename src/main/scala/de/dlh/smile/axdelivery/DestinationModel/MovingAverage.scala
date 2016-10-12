@@ -8,10 +8,12 @@ import org.apache.spark.sql.functions._
 object MovingAverage {
   def getMovingAverage(df: DataFrame): DataFrame = {
     // Compute number of searches per OnD, year and month
-    val dfTmp = df.select("BFO", "BFD", "year", "month", "session_guid")
+    val dfTmp = df
+      .select("BFO", "BFD", "year", "month", "session_guid")
       .groupBy("BFO", "BFD", "year", "month")
       .agg(countDistinct("session_guid").alias("freq"))
-    // Compute the moving average 1/4, 1/2, 1/4
+    
+      // Compute the moving average 1/4, 1/2, 1/4
     val windowSpec = Window.partitionBy(col("BFO"), col("BFD")).orderBy(col("month")).rangeBetween(-1, 1)
     val moving_average = sum(col("freq")).over(windowSpec)
     val dfResult = dfTmp.select(

@@ -67,5 +67,8 @@ case class DataFrameUpdatable(df: DataFrame) {
         (col("BFD") !== "null"))
   }
 
-	
+  
+  def filterPartitionFieldsOneMonth(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): DataFrameUpdatable = {
+			df.filter(col("year") === year and col("month") === month)
+	}
 }
