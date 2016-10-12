@@ -1,12 +1,8 @@
 package de.dlh.smile.axdelivery
 
-import org.apache.spark.SparkContext
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.hive.HiveContext
+import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
-import de.dlh.engine.commons.Contexts
 
 
 object Stub {

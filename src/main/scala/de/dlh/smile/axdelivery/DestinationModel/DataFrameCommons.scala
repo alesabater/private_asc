@@ -30,8 +30,8 @@ case class DataFrameUpdatable(df: DataFrame) {
 					)
 	}
 
-	def getBFTUDEPField(columnDate: String, columnMap: String, key: String, format: String = "yyyyMMdd"): DataFrameUpdatable = {
-			df.withColumn("dateTmp", udfCreateDateFrom(col(columnMap).getItem(key), lit(format), lit(format)))
+	def getBFTUDEPField(columnDate: String, columnMap: String, key: String, inFormat: String = "yyyyMMdd", outFormat: String = "yyyy-MM-dd"): DataFrameUpdatable = {
+			df.withColumn("dateTmp", udfCreateDateFrom(col(columnMap).getItem(key), lit(inFormat), lit(outFormat)))
 			.withColumn("BFTuDep", datediff(to_date(col("dateTmp")), to_date(col(columnDate))))
 	}
 

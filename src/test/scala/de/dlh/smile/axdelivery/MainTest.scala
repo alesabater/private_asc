@@ -1,9 +1,9 @@
 package de.dlh.smile.axdelivery
 
-import de.dlh.smile.axdelivery.DestinationModel.{Transformations, MovingAverage, DestinationRecommender, UDAFGroupConcat}
-import de.dlh.smile.engine.commons.Contexts
-import org.scalatest.{FlatSpec, Matchers}
+
 import org.mockito.Mockito._
+import org.scalatest.{FlatSpec, Matchers}
+import org.apache.spark.sql.functions.col
 
 class MainTest extends FlatSpec with Matchers {
   
@@ -11,11 +11,10 @@ class MainTest extends FlatSpec with Matchers {
     val ioMock:IO = mock(classOf[IO])
     when(ioMock.read) thenReturn Stub.dfInput
     when(ioMock.readAirportCodes) thenReturn Stub.dfAirportCodes
+    val dfIn = ioMock.read
     val df = Main.execute(ioMock.read, ioMock)
-    val df1 = Stub.dfBeforeModel
     df.printSchema()
-    df1.printSchema()
     df.show()
-    df1.show()
+    dfIn.select(col("cs_uri_query").getItem("Screen"),col("year"),col("month")).show(1000)
   }
 }
