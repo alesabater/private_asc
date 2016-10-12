@@ -85,6 +85,10 @@
 //val filter3 = filter2.filter("BFO in " + origincities)
 //
 //
+//
+// // WE ARE HERE
+//
+//
 //////////////////////////////////////////////// TO DO ////////////////////////////////////////
 //// filter keeping only leisure searches
 ////val filter4 = filter1.filter("... = 'red'") // lets finalize that later...

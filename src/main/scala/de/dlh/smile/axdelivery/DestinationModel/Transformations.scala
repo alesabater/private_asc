@@ -21,20 +21,14 @@ object Transformations extends Logging{
     df.filterPartitionFieldsOneYearFrom()
       .filterValueMapEquals("cs_uri_query", "Screen", "FOFP")
       .getBFTUDEPField("date", "cs_uri_query", "BFDepDate")
-//      .flatMapType("cs_uri_query", LoadedProperties.fromMapColumns)
-//      .select(LoadedProperties.webtrendsColumns.map(col(_)): _*)
-//      .withColumn("BFO", getFirstIATA(col("BFO")))
-//      .withColumn("BFD", getFirstIATA(col("BFD")))
-//      .airportToCityCode(dfAirportMap, "BFO")
-//      .airportToCityCode(dfAirportMap, "BFD")
-  }
-  
-  def filterRT(df: DataFrame): DataFrame = {
-    df.filter("BFTripType = 'RT'").filter("BFO <> 'null'").filter("BFD <> 'null'")
-  }
-  
-  def filterOrigin(df: DataFrame): DataFrame = {
-    df.filter(col("BFO").isin(LoadedProperties.originCities: _*))
+      .flatMapType("cs_uri_query", LoadedProperties.fromMapColumns)
+      .select(LoadedProperties.webtrendsColumns.map(col(_)): _*)
+      .withColumn("BFO", getFirstIATA(col("BFO")))
+      .withColumn("BFD", getFirstIATA(col("BFD")))
+      .airportToCityCode(dfAirportMap, "BFO")
+      .airportToCityCode(dfAirportMap, "BFD")
+      .filterOrigin()
+      .filterRT()
   }
 
   def filterLeisure(df: DataFrame): DataFrame = {

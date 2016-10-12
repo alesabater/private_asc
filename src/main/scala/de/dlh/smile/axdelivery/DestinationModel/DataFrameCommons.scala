@@ -4,6 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.joda.time.DateTime
 import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
+import de.dlh.smile.axdelivery.LoadedProperties
 import org.apache.spark.sql.types.StringType
 
 import scala.util.{Failure, Success, Try}
@@ -55,5 +56,16 @@ case class DataFrameUpdatable(df: DataFrame) {
 	def airportToCityCode(dfAirportMap: DataFrame, colName: String): DataFrame = {
 			df.join(dfAirportMap, df(colName) === dfAirportMap("Airport"), "left").drop("Airport").drop(colName).withColumnRenamed("City", colName)
 	}
+
+  def filterOrigin(): DataFrame = {
+    df.filter(col("BFO").isin(LoadedProperties.originCities: _*))
+  }
+
+  def filterRT(): DataFrame = {
+    df.filter((col("BFTripType") === "RT") and
+        (col("BFO") !== "null") and
+        (col("BFD") !== "null"))
+  }
+
 	
 }

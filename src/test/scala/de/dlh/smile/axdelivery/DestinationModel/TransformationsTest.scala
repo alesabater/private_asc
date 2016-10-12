@@ -16,18 +16,6 @@ class TransformationsTest extends FlatSpec with Matchers {
     val dfResult = Transformations.formatAndRegisterDataFrame(df, dfAirportMap)
     dfResult.show()
   }
-  
-  "filterRT" should "filter all the rows with BFTripType different than RT" in {
-    val df = Stub.dfWebtendsAfterFormat
-    val dfResult = Transformations.filterRT(df)
-    dfResult.count() should equal(3)
-  }
-
-	"filterOrigin" should "filter BFO with a defined set of originCities" in {
-		val df = Stub.dfStringOrigin
-				val dfResult = Transformations.filterOrigin(df)
-				dfResult.collect() should equal(Array(Row("MAD"),Row("BCN")))
-	}
 
 	"scoreTravelReason" should "return the dataFrame with an extra column called scoreTRM" in {
 	  val df = Stub.dfWebtendsAfterFormat

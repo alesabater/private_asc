@@ -11,10 +11,8 @@ class MainTest extends FlatSpec with Matchers {
     val ioMock:IO = mock(classOf[IO])
     when(ioMock.read) thenReturn Stub.dfInput
     when(ioMock.readAirportCodes) thenReturn Stub.dfAirportCodes
-    val dfIn = ioMock.read
     val df = Main.execute(ioMock.read, ioMock)
     df.printSchema()
     df.show()
-    dfIn.select(col("cs_uri_query").getItem("Screen"),col("year"),col("month")).show(1000)
   }
 }

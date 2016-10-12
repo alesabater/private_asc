@@ -47,4 +47,16 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
 	  val dfResult = df.airportToCityCode(dfAirportMap, "BFO")
 	  dfResult.show()
 	}
+
+	"filterRT" should "filter all the rows with BFTripType different than RT" in {
+		val df = Stub.dfWebtendsAfterFormat
+		val dfResult = df.filterRT()
+		dfResult.count() should equal(3)
+	}
+
+	"filterOrigin" should "filter BFO with a defined set of originCities" in {
+		val df = Stub.dfStringOrigin
+		val dfResult = df.filterOrigin()
+		dfResult.collect() should equal(Array(Row("MAD"),Row("BCN")))
+	}
 }
