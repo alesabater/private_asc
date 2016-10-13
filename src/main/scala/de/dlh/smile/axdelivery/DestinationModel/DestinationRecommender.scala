@@ -8,8 +8,6 @@ import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
 object DestinationRecommender {
   
   def scaleWithPreviousYear(df: DataFrame): DataFrame = {
-    // this should be applied before the smoothing
-    // Before doing the ranking, we scale the searches based on last year same month
     val year = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("year")).first().getInt(0)
 		val month = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("month")).first().getInt(0)
     val currentMonth = df.filter((col("year") === year + 1) and (col("month") === month))
@@ -32,20 +30,28 @@ object DestinationRecommender {
             (col("current_freq")/col("last_freq")).alias("factor"),
             col("last_year").alias("factor_year"))
     
-    val dfResult = df
-      .filter((col("year") !== year) or (col("month") !== month))
-      .join(yearFactor,
-        (df("year") === yearFactor("factor_year")) and (df("BFO") === yearFactor("factor_BFO")) and (df("BFD") === yearFactor("factor_BFD")),
-        "left")
-        .select(col("BFO"), 
-            col("BFD"), 
-            col("year"), 
-            col("month"), 
-            col("freq"), 
-            col("factor"),
-            (col("freq") * coalesce(col("factor"), lit(1))).alias("freq_scaled"))    
+    val dfResult = yearFactor.rdd.isEmpty() match {
+      case true => df.select(col("BFO"), 
+              col("BFD"), 
+              col("year"), 
+              col("month"), 
+              col("freq")) 
+      case false => df.filter((col("year") !== year) or (col("month") !== month))
+              .join(yearFactor,
+                (df("year") === yearFactor("factor_year")) and (df("BFO") === yearFactor("factor_BFO")) and (df("BFD") === yearFactor("factor_BFD")),
+                "left")
+                .select(col("BFO"), 
+                    col("BFD"), 
+                    col("year"), 
+                    col("month"), 
+                    //col("freq"), 
+                    //col("factor"),
+                    (col("freq") * coalesce(col("factor"), lit(1))).alias("freq")) 
+    }
+          
    dfResult
   }
+  
   def getMovingAverage(df: DataFrame): DataFrame = {
     // Compute number of searches per OnD, year and month
     val dfTmp = df
@@ -53,11 +59,14 @@ object DestinationRecommender {
       .groupBy("BFO", "BFD", "year", "month")
       .agg(countDistinct("session_guid").alias("freq"))
     
+      // Scale based in last year data
+    val dfScaledTmp = scaleWithPreviousYear(dfTmp)
+    
     // The months of Jan and Dec do not have enough data points to compute the moving average
       // for that reason we add month 0 (same as Dec) and month 13 (same as Jan) for the computations
-    val dfTmpEnlarged = dfTmp.unionAll(
-        dfTmp.filter(col("month") === 12).select(col("BFO"), col("BFD"), col("year"), lit(0).alias("month"), col("freq")))
-        .unionAll(dfTmp.filter(col("month") === 1).select(col("BFO"), col("BFD"), col("year"), lit(13).alias("month"), col("freq")))
+    val dfTmpEnlarged = dfScaledTmp.unionAll(
+        dfScaledTmp.filter(col("month") === 12).select(col("BFO"), col("BFD"), (col("year") + 1).alias("year"), lit(0).alias("month"), col("freq")))
+        .unionAll(dfScaledTmp.filter(col("month") === 1).select(col("BFO"), col("BFD"), (col("year") - 1).alias("year"), lit(13).alias("month"), col("freq")))
         
       // Compute the moving average 1/4, 1/2, 1/4
     val windowSpec = Window.partitionBy(col("BFO"), col("BFD")).orderBy(col("month")).rangeBetween(-1, 1)
@@ -73,7 +82,7 @@ object DestinationRecommender {
             col("BFD"),
             col("year"),
             col("month"),
-            ((col("smoothedfreq") + col("freq") /3) * 3/4).alias("freq")
+            ((col("smoothedfreq") + col("freq")) / 4).alias("freq")
            )
            .filter((col("month") >= 1) and col("month") <= 12) // remove the fake months that we added
    dfResult
