@@ -48,6 +48,7 @@ object FormatOutput {
          UDAFGroupConcat(col("_14")).alias("search_stream_dest_14"),
          UDAFGroupConcat(col("_15")).alias("search_stream_dest_15")
          )
+         // what happens if there is no 15 value
          
 		val dfResult = withDayColumns
      .drop(pivotCol)

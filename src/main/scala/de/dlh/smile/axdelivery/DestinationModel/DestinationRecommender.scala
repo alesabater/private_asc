@@ -68,7 +68,7 @@ object DestinationRecommender {
         dfScaledTmp.filter(col("month") === 12).select(col("BFO"), col("BFD"), (col("year") + 1).alias("year"), lit(0).alias("month"), col("freq")))
         .unionAll(dfScaledTmp.filter(col("month") === 1).select(col("BFO"), col("BFD"), (col("year") - 1).alias("year"), lit(13).alias("month"), col("freq")))
         
-      // Compute the moving average 1/4, 1/2, 1/4
+    // Compute the moving average 1/4, 1/2, 1/4
     val windowSpec = Window.partitionBy(col("BFO"), col("BFD")).orderBy(col("month")).rangeBetween(-1, 1)
     val moving_average = sum(col("freq")).over(windowSpec)
     val dfResult = dfTmpEnlarged.select(
