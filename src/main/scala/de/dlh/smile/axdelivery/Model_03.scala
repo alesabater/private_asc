@@ -12,7 +12,6 @@
 //
 //// Read properties
 //
-//
 /////////////////////////////////
 //// Data load and preparation //
 //val alllogs = sqlContext.read.parquet(datalocation)

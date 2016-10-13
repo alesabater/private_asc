@@ -1,8 +1,10 @@
 package de.dlh.smile.axdelivery.DestinationModel
 
+import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.hive.HiveContext
 
 
 object MovingAverage {

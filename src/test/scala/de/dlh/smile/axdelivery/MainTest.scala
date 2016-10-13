@@ -12,7 +12,8 @@ class MainTest extends FlatSpec with Matchers {
     when(ioMock.read) thenReturn Stub.dfInput
     when(ioMock.readAirportCodes) thenReturn Stub.dfAirportCodes
     val df = Main.execute(ioMock.read, ioMock)
+
     df.printSchema()
-    df.show()
+    df.show(10)
   }
 }

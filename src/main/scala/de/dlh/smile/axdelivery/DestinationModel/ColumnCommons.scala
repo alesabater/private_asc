@@ -3,21 +3,27 @@ package de.dlh.smile.axdelivery.DestinationModel
 import org.apache.spark.Logging
 import org.apache.spark.sql.functions._
 import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 
 import scala.util.{Failure, Success, Try}
 
 object ColumnCommons extends Enumeration with Logging {
 
-  val udfCreateDateFrom = udf((dateString: String, inFormat: String, outFormat: String) => Transformations.createDateFrom(dateString, inFormat, outFormat))
+  def getDayOfTheWeek: ((String, String) => Option[Int]) = (date: String, format: String) => Transformations.createDateFrom(date,format)((date: LocalDateTime) => date.getDayOfWeek)
+  def udfGetDayOfTheWeek = udf(getDayOfTheWeek)
+
+  def getStringDateFormatted: ((String, String) => Option[String]) = (date: String, format: String) => Transformations.createDateFrom(date,format)((date: LocalDateTime) => date.toString("yyyy-MM-dd"))
+  def udfGetStringDateFormatted = udf(getStringDateFormatted)
+
+  def getHourOfDay: ((String, String) => Option[Int]) = (date: String, format: String) => Transformations.createDateFrom(date,format)((date: LocalDateTime) => date.getHourOfDay)
+  def udfGetHourOfDay = udf(getHourOfDay)
+
   val udfGetTimeInd = udf((ind: Int) => Transformations.getTimeInd(ind))
   val udfGetDurationStay = udf((duration: String) => Transformations.getDurationStay(duration))
   val udfGetBrowserName = udf((userAgent: String) => Transformations.getBrowserName(userAgent))
+  val udfGetOSName = udf((userAgent: String) => Transformations.getOSName(userAgent))
   val udfGetReferrerCat = udf((referrer: String) => Transformations.getReferrerCat(referrer))
-  
-  val getFirstIATA = udf((iataString: String) => iataString match {
-    case null => None
-    case _ => Some(iataString.substring(0, 3))
-  }
-  )
+  val udfGetFirstIATA = udf((iataString: String) => Transformations.getFirstIATA(iataString))
+  val udfGetLanguage = udf((language: String) => Transformations.getLanguage(language))
+  val udfGetType = udf((typ: String) => Transformations.getType(typ))
 }

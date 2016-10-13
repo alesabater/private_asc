@@ -10,25 +10,18 @@ import de.dlh.smile.axdelivery.LoadedProperties
 import org.apache.spark.sql.functions._
 import de.dlh.smile.engine.commons._
 import org.apache.spark.Logging
+import org.joda.time.{LocalDate, LocalDateTime}
 import org.joda.time.format.DateTimeFormat
+
 import scala.util.{Failure, Success, Try}
 
 
 
 object Transformations extends Logging{
 
-  def formatAndRegisterDataFrame(df: DataFrame, dfAirportMap: DataFrame): DataFrame = {
-    df.filterPartitionFieldsOneYearFrom()
-      .filterValueMapEquals("cs_uri_query", "Screen", "FOFP")
-      .getBFTUDEPField("date", "cs_uri_query", "BFDepDate")
-      .flatMapType("cs_uri_query", LoadedProperties.fromMapColumns)
-      .select(LoadedProperties.webtrendsColumns.map(col(_)): _*)
-      .withColumn("BFO", getFirstIATA(col("BFO")))
-      .withColumn("BFD", getFirstIATA(col("BFD")))
-      .airportToCityCode(dfAirportMap, "BFO")
-      .airportToCityCode(dfAirportMap, "BFD")
-      .filterOrigin()
-      .filterRT()
+  def getFirstIATA(iataString: String) = iataString match {
+    case null => None
+    case _ => Some(iataString.substring(0, 3))
   }
 
   def filterLeisure(df: DataFrame): DataFrame = {
@@ -36,21 +29,16 @@ object Transformations extends Logging{
     // Leisure bookings have a scoreTRM <= 0.5
   }
 
-  def createDateFrom(date: String, inFormat: String, outFormat: String) = {
+  def createDateFrom[A](date: String, inFormat: String)(fn: LocalDateTime => A): Option[A] = {
     val inFormatter = Try(DateTimeFormat.forPattern(inFormat)) match {
       case Success(s) => s
       case Failure(f) => log.warn("The provided input format: \"" + inFormat + "\" is not a valid DateTime format. Using default pattern yyyyMMdd");
         DateTimeFormat.forPattern("yyyyMMdd")
     }
-    val outFormatter = Try(DateTimeFormat.forPattern(outFormat)) match {
-      case Success(s) => s
-      case Failure(f) => log.warn("The provided output format: \"" + outFormat + "\" is not a valid DateTime format. Using default toString");
-        DateTimeFormat.forPattern("yyyyMMdd")
-    }
     val dateResult = date match {
       case "" | "null" | null => null
       case _ => {
-        val formattedDateTime = Try(inFormatter.parseLocalDate(date))
+        val formattedDateTime = Try(inFormatter.parseLocalDateTime(date))
         formattedDateTime match {
           case Success(s) => s
           case Failure(f) => null
@@ -59,7 +47,7 @@ object Transformations extends Logging{
     }
     dateResult match {
       case null => None
-      case _ => Some(dateResult.toString(outFormatter))
+      case _ => Some(fn(dateResult))
     }
   }
 
@@ -87,10 +75,17 @@ object Transformations extends Logging{
     if (cs_userString.indexOf("SamsungBrowser") != -1) "SamsungBrowser"
     else if (cs_userString.indexOf("Firefox") != -1) "Firefox"
     else if (cs_userString.indexOf("Opera") != -1) "Opera"
-    else if (cs_userString.indexOf("Trident") != -1) "IE"
+    else if (cs_userString.indexOf("Trident") != -1) "Trident"
     else if (cs_userString.indexOf("MSIE") != -1) "IE-compatible"
     else if (cs_userString.indexOf("Chrome") != -1) "Chrome"
     else if (cs_userString.indexOf("Safari") != -1) "Safari"
+    else "Other"
+  }
+
+  def getOSName(cs_userString: String) = {
+    if (cs_userString.indexOf("Windows") != -1) "Windows"
+    else if (cs_userString.indexOf("Macintosh") == -1 ) "Macintosh"
+    else if (cs_userString.indexOf("Macintosh") == -1 && cs_userString.indexOf("Linux") == -1 & cs_userString.indexOf("Windows") == -1) "Unknown"
     else "Other"
   }
 
@@ -99,4 +94,18 @@ object Transformations extends Logging{
     else if (referrerString.indexOf("google") != -1) "Google"
     else "Other"
   }
+
+  def getLanguage(referrerString: String) = {
+    if (referrerString.indexOf("en") != -1 ) "English"
+    else if (referrerString.indexOf("de") != -1) "Deutsch"
+    else "Other"
+  }
+
+  def getType(referrerString: String) = {
+    if (referrerString.indexOf("IK") != -1 ) "IK"
+    else if (referrerString.indexOf("K") != -1) "K"
+    else "Other"
+  }
+
+
 }

@@ -12,10 +12,10 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
 	"getBFTUDEPField" should "create a column with the BFTUDEP column" in {
 		val df = Stub.dfMapDate
 				val dfResult = df.getBFTUDEPField("date_prev","date_dep","k1")
-				//dfResult.show
-				//dfResult.printSchema()
-				dfResult.filter(col("BFTUDEP").isNotNull).count should equal(4)
-				dfResult.select("BFTUDEP").take(4) should equal(Array(Row(12),Row(11),Row(-4),Row(620)))
+				dfResult.show
+				dfResult.printSchema()
+				dfResult.filter(col("BFTuDep").isNotNull).count should equal(4)
+				dfResult.select("BFTuDep").take(4) should equal(Array(Row(12),Row(11),Row(-4),Row(620)))
 	}
 
   "flatMapType" should "flat desired keys with their values out of a Map Column" in {

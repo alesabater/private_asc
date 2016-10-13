@@ -8,6 +8,7 @@ import org.apache.spark.sql.types._
 object Stub {
   val dfFilterDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateFilterSeq), Schemas.dateFilterSchema)
   val dfStringDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateStringSeq), Schemas.dateStringSchema)
+  val dfFullStringDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateFullStringSeq), Schemas.dateStringSchema)
   val dfStringIATA = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.IATAStringSeq), Schemas.IATAStringSchema)
   val dfStringOrigin = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.originStringSeq), Schemas.IATAStringSchema)
   val dfMapDate = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.dateMapSeq), Schemas.dateMapSchema)
@@ -15,6 +16,7 @@ object Stub {
   val dfOneColString = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.oneColString), Schemas.oneColStringSchema)
   val dfBrowserString = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.browserString), Schemas.oneColStringSchema)
   val dfReferrerCat = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.referrerCat), Schemas.oneColStringSchema)
+  val dfLanguage = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.languageString), Schemas.oneColStringSchema)
   val dfInput = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
   val dfAirportCodes = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes").getPath)
   val dfBeforeModel = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/training").getPath)
@@ -37,6 +39,13 @@ object TestSets {
 			Row("Invalid date")
 			)
 
+  val dateFullStringSeq = Seq(
+    Row("2016-09-27 07:50:00.0"),
+    Row("2016-09-26 11:20:00.0"),
+    Row(null),
+    Row("Invalid date")
+  )
+
 	val IATAStringSeq = Seq(
 			Row("MAD;FRA;jkh"),
 			Row("BCN"),
@@ -53,13 +62,13 @@ object TestSets {
 			)
 
 	val dateMapSeq = Seq(
-			Row("2016-09-15", Map("k1" -> "20160927", "k2" -> "val")),
-			Row("2016-09-15", Map("k1" -> "20160926", "k2" -> "val")),
-			Row("2016-09-30", Map("k1" -> "20160926", "k2" -> "val")),
-			Row("2015-01-15", Map("k1" -> "20160926", "k2" -> "val")),
+			Row("2016-09-15 22:12:22.5", Map("k1" -> "20160927", "k2" -> "val")),
+			Row("2016-09-15 11:12:22.5", Map("k1" -> "20160926", "k2" -> "val")),
+			Row("2016-09-30 22:12:22.5", Map("k1" -> "20160926", "k2" -> "val")),
+			Row("2015-01-15 23:72:22.5", Map("k1" -> "20160926", "k2" -> "val")),
 			Row(null, Map("k1" -> "20160926", "k2" -> "val")),
-			Row("2016-09-15", Map("k2" -> "val")),
-			Row("2016-09-15", Map("k1" -> null, "k2" -> "val"))
+			Row("2016-09-15 12:12:22.5", Map("k2" -> "val")),
+			Row("2016-09-15 12:42:22.5", Map("k1" -> null, "k2" -> "val"))
 			)
 
 	val customerSalesSeq = Seq(
@@ -133,6 +142,20 @@ object TestSets {
     Row("Mozilla/5.0+(Linux;+Android+5.0.2;+P023+Build/LRX22G;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/47.0.2526.100+Safari/537.36"),
     Row("Mozilla/5.0+(Windows+NT+10.0;+WOW64;+rv:47.0)+Gecko/20100101+Firefox/47.0+TO-Browser/TOB7.47.0.111_03"),
     Row("Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_11_1)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/51.0.2704.84+Safari/537.36")
+  )
+
+  val languageString = Seq(
+    Row("en"),
+    Row("it"),
+    Row("de"),
+    Row("es"),
+    Row("en"),
+    Row("de"),
+    Row("de"),
+    Row("de"),
+    Row("en"),
+    Row("en"),
+    Row("es")
   )
 
   val referrerCat = Seq(

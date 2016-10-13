@@ -13,7 +13,7 @@ class TransformationsTest extends FlatSpec with Matchers {
   "formatAndRegister" should "format and register data frame" in {
     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
     val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
-    val dfResult = Transformations.formatAndRegisterDataFrame(df, dfAirportMap)
+    val dfResult = LeisureModel.formatAndRegisterDataFrame(df, dfAirportMap)
     dfResult.show()
   }
 
@@ -26,9 +26,9 @@ class TransformationsTest extends FlatSpec with Matchers {
 	}
 
 	"createDateFrom" should "get the day of the week out of a string date" in {
-    val valid = createDateFrom("20160928", "yyyyMMdd", "MM")
-    val invalid = createDateFrom("2016-09-28 10:00:00.0", "yyyy-MM-dd HH:mm:ss.S", "bad date")
-    val nullResult = createDateFrom(null, "yyyyMMdd", "EEE")
+    val valid = createDateFrom("20160928", "yyyyMMdd")(_.toString("MM"))
+    val invalid = createDateFrom("2016-09-28 10:00:00.0", "yyyy-MM-dd HH:mm:ss.S")(_.toString("yyyyMMdd"))
+    val nullResult = createDateFrom(null, "yyyyMMdd")(_.toString())
 
     valid should equal (Some("09"))
     invalid should equal (Some("20160928"))
