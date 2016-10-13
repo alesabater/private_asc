@@ -9,31 +9,31 @@ import de.dlh.smile.engine.commons.Contexts
 
 
 class UDAFGroupConcatTest extends FlatSpec with Matchers {
-//	"GroupConcat" should "do the group_concat aggregation" in {
-//		val df = Stub.dfCustomerSales
-//		
-//		// get distinct days from data (this assumes there are not too many of them):
-//		val distinctValues: Array[String] = df.select("Day")
-//    .distinct()
-//    .collect()
-//    .map(_.getAs[String]("Day"))
-//    
-//    // add column for each day with the Sale value if days match:
-//    val withDayColumns = distinctValues.foldLeft(df) { 
-//      case (data, day) => data.selectExpr("*", s"IF(Day = '$day', Month, '') AS $day")
-//    }
-//		
-//		val dfResult = withDayColumns
-//     .drop("Day")
-//     .drop("Month")
-//     .groupBy("Customer")
-//     .agg(UDAFGroupConcat(col("Mon")).alias("Mon"),
-//         UDAFGroupConcat(col("Fri")).alias("Fri"))
-//         
-//		//val dfResult = df.groupBy("Customer").pivot("Day", Seq("Mon", "Tue", "Wed", "Fri")).agg(UDAFGroupConcat(col("Month")).as("Months"))
-//		dfResult.show()
-//	}
-//	
+	"GroupConcat" should "do the group_concat aggregation" in {
+		val df = Stub.dfCustomerSales
+		
+		// get distinct days from data (this assumes there are not too many of them):
+		val distinctValues: Array[String] = df.select("Day")
+    .distinct()
+    .collect()
+    .map(_.getAs[String]("Day"))
+    
+    // add column for each day with the Sale value if days match:
+    val withDayColumns = distinctValues.foldLeft(df) { 
+      case (data, day) => data.selectExpr("*", s"IF(Day = '$day', Month, '') AS $day")
+    }
+		
+		val dfResult = withDayColumns
+     .drop("Day")
+     .drop("Month")
+     .groupBy("Customer")
+     .agg(UDAFGroupConcat(col("Mon")).alias("Mon"),
+         UDAFGroupConcat(col("Fri")).alias("Fri"))
+         
+		//val dfResult = df.groupBy("Customer").pivot("Day", Seq("Mon", "Tue", "Wed", "Fri")).agg(UDAFGroupConcat(col("Month")).as("Months"))
+		dfResult.show()
+	}
+	
 	"GroupConcat2" should "format the sample data in the expected output format" in {
 	  val df = Stub.dfCustomerSales
     
@@ -84,19 +84,6 @@ class UDAFGroupConcatTest extends FlatSpec with Matchers {
      .agg(UDAFGroupConcat(col("_0")).alias("search_stream_dest_0"),
          UDAFGroupConcat(col("_1")).alias("search_stream_dest_1"),
          UDAFGroupConcat(col("_2")).alias("search_stream_dest_2")
-//         UDAFGroupConcat(col("3")).alias("search_stream_dest_3"),
-//         UDAFGroupConcat(col("4")).alias("search_stream_dest_4"),
-//         UDAFGroupConcat(col("5")).alias("search_stream_dest_5"),
-//         UDAFGroupConcat(col("6")).alias("search_stream_dest_6"),
-//         UDAFGroupConcat(col("7")).alias("search_stream_dest_7"),
-//         UDAFGroupConcat(col("8")).alias("search_stream_dest_8"),
-//         UDAFGroupConcat(col("9")).alias("search_stream_dest_9"),
-//         UDAFGroupConcat(col("10")).alias("search_stream_dest_10"),
-//         UDAFGroupConcat(col("11")).alias("search_stream_dest_11"),
-//         UDAFGroupConcat(col("12")).alias("search_stream_dest_12"),
-//         UDAFGroupConcat(col("13")).alias("search_stream_dest_13"),
-//         UDAFGroupConcat(col("14")).alias("search_stream_dest_14"),
-         //UDAFGroupConcat(col("_15")).alias("search_stream_dest_15")
          )
          
 		//val dfResult = df.groupBy("Customer").pivot("Day", Seq("Mon", "Tue", "Wed", "Fri")).agg(UDAFGroupConcat(col("Month")).as("Months"))
