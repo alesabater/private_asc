@@ -2,15 +2,10 @@ package de.dlh.smile.axdelivery.DestinationModel
 
 
 
-import de.dlh.smile.engine.commons.Contexts
-import org.apache.spark.sql.DataFrame
-import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
-import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
-import de.dlh.smile.axdelivery.LoadedProperties
-import org.apache.spark.sql.functions._
-import de.dlh.smile.engine.commons._
 import org.apache.spark.Logging
-import org.joda.time.{LocalDate, LocalDateTime}
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
+import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
 
 import scala.util.{Failure, Success, Try}

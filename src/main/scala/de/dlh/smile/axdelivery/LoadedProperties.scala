@@ -11,13 +11,13 @@ import collection.JavaConversions._
 
 object LoadedProperties {
 
-  def createMap(path: String, config: Config): Map [String, String] = {
+  def createMap(path: String, config: Config): Map [String, Double] = {
     val list : Iterable[ConfigObject] = config.getObjectList(path).asScala
     (for {
       item : ConfigObject <- list
       entry : Entry[String, ConfigValue] <- item.entrySet().asScala
       key = entry.getKey
-      value = entry.getValue.unwrapped().toString
+      value = entry.getValue.unwrapped().asInstanceOf[Double]
     } yield (key, value)).toMap
   }
 
