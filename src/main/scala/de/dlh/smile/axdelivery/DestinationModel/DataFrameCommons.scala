@@ -27,7 +27,7 @@ case class DataFrameUpdatable(df: DataFrame) {
 	def filterPartitionFieldsOneYearFrom(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): DataFrameUpdatable = {
 			df.filter(
 					(col("year") === year and col("month") <= month) or
-					(col("year") === (year - 1) and col("month") > month)
+					(col("year") === (year - 1) and col("month") >= month) // modified to read one year and one month
 					)
 	}
 
@@ -67,5 +67,8 @@ case class DataFrameUpdatable(df: DataFrame) {
         (col("BFD") !== "null"))
   }
 
-	
+  
+  def filterPartitionFieldsOneMonth(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): DataFrameUpdatable = {
+			df.filter(col("year") === year and col("month") === month)
+	}
 }
