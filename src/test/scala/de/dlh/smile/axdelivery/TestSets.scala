@@ -20,6 +20,7 @@ object Stub {
   val dfBeforeModel = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/training").getPath)
   val dfCustomerSales = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.customerSalesSeq), Schemas.customerSalesSchema)
 	val dfWebtendsAfterFormat = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.webtrendsAfterFormatSeq), Schemas.webtrendsAfterFormatSchema)
+	val dfResultRecommendation = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.resultRecommendationSeq), Schemas.resultRecommendationSchema)
 }
 
 
@@ -167,6 +168,45 @@ object TestSets {
     Row("Direct%20Traffic"),
     Row("www.google.de")
   )
+  
+  val resultRecommendationSeq = Seq(
+      Row("MAD", "FRA", 0),
+      Row("MAD", "PAR", 1),
+      Row("MAD", "PHF", 2),
+      Row("MAD", "SVG", 3),
+      Row("MAD", "BCN", 4),
+      Row("MAD", "HGJ", 5),
+      Row("MAD", "HSL", 6),
+      Row("MAD", "TYU", 7),
+      Row("MAD", "THY", 8),
+      Row("MAD", "PEK", 9),
+      Row("MAD", "THO", 10),
+      Row("MAD", "GEN", 11),
+      Row("MAD", "GIN", 12),
+      Row("MAD", "HAL", 13),
+      Row("MAD", "HAW", 14),
+      Row("MAD", "HOW", 15),
+      Row("FRA", "MAD", 0),
+      Row("FRA", "PAR", 1),
+      Row("FRA", "PHF", 2),
+      Row("FRA", "SVG", 3),
+      Row("FRA", "BCN", 4),
+      Row("FRA", "HGJ", 5),
+      Row("FRA", "HSL", 6),
+      Row("BER", "FRA", 0),
+      Row("BER", "PAR", 1),
+      Row("BER", "PHF", 2),
+      Row("BER", "SVG", 3),
+      Row("BER", "BCN", 4),
+      Row("BER", "HGJ", 5),
+      Row("BER", "HSL", 6),
+      Row("BER", "TYU", 7),
+      Row("BER", "THY", 8),
+      Row("BER", "PEK", 9),
+      Row("BER", "THO", 10),
+      Row("BER", "GEN", 11),
+      Row("BER", "GIN", 12)
+      )
 }
 
 object Schemas {
@@ -222,5 +262,11 @@ object Schemas {
 
   val oneColStringSchema = StructType(Seq(
     StructField("one", StringType, true)
+  ))
+  
+  val resultRecommendationSchema = StructType(Seq(
+      StructField("BFO", StringType, true),
+      StructField("BFD", StringType, true),
+      StructField("mdlrank", IntegerType, true)
   ))
 }
