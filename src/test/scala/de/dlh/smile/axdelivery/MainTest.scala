@@ -3,7 +3,6 @@ package de.dlh.smile.axdelivery
 
 import org.mockito.Mockito._
 import org.scalatest.{FlatSpec, Matchers}
-import org.apache.spark.sql.functions.col
 
 class MainTest extends FlatSpec with Matchers {
   
@@ -14,6 +13,6 @@ class MainTest extends FlatSpec with Matchers {
     val df = Main.execute(ioMock.read, ioMock)
 
     df.printSchema()
-    df.show(10)
+    df.show(100)
   }
 }

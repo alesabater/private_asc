@@ -41,8 +41,8 @@ object TestSets {
 			)
 
   val dateFullStringSeq = Seq(
-    Row("2016-09-27 07:50:00.0"),
-    Row("2016-09-26 11:20:00.0"),
+    Row("2015-11-15 05:17:43.0"),
+    Row("2015-11-15 05:17:43.0"),
     Row(null),
     Row("Invalid date")
   )

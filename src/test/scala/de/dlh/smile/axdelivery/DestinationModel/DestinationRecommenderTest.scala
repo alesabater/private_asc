@@ -61,7 +61,7 @@ class DestinationRecommenderTest extends FlatSpec with Matchers {
       val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
       val dfResult = DestinationRecommender.getRecommendedDestinations(
           DestinationRecommender.getMovingAverage(
-              Transformations.formatAndRegisterDataFrame(df, dfAirportMap)
+              LeisureModel.formatAndRegisterDataFrame(df, dfAirportMap)
               )
           )       
       dfResult.show

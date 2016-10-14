@@ -27,11 +27,11 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
     dfResult.select(col("k1")).take(7).filter( row => row.getString(0) == null).length should equal(2)
   }
 
-	"filterByDate" should "filter dataframe based on dates" in {
-		val df = Stub.dfFilterDate
-				val dfResult = df.filterPartitionFieldsOneYearFrom(2016, 9)
-				dfResult.count() should equal(2)
-	}
+//	"filterByDate" should "filter dataframe based on dates" in {
+//		val df = Stub.dfFilterDate
+//				val dfResult = df.filterPartitionFieldsOneYearFrom(2016, 9)
+//				dfResult.count() should equal(2)
+//	}
 
 	"filterFromMap" should "filter dataframe based on a Map column key and value" in {
 		val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data").getPath)
@@ -60,9 +60,9 @@ class DataFrameCommonsTest extends FlatSpec with Matchers {
 		dfResult.collect() should equal(Array(Row("MAD"),Row("BCN")))
 	}
 	
-  "filterOneMonth" should "filter dataframe based on dates and keep only one month" in {
-		val df = Stub.dfFilterDate
-		val dfResult = df.filterPartitionFieldsOneMonth(2016, 9)
-		dfResult.count() should equal(1)
-	}
+//  "filterOneMonth" should "filter dataframe based on dates and keep only one month" in {
+//		val df = Stub.dfFilterDate
+//		val dfResult = df.filterPartitionFieldsOneMonth(2016, 9)
+//		dfResult.count() should equal(1)
+//	}
 }

@@ -21,6 +21,7 @@ class ColumnCommonsTest extends FlatSpec with Matchers {
   "udfGetDayOfTheWeek" should "get the specified segment of the date from a String date" in {
     val df = Stub.dfFullStringDate
     val dfResult = df.withColumn("date", udfGetDayOfTheWeek(col("date"), lit("yyyy-MM-dd HH:mm:ss.S")))
+    dfResult.show()
     dfResult.count should equal(4)
     dfResult.filter(col("date").isNotNull).count should equal(2)
     dfResult.take(1)(0).getInt(0) should equal(2)

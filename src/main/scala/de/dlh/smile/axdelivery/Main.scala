@@ -2,10 +2,8 @@ package de.dlh.smile.axdelivery
 
 import de.dlh.smile.axdelivery.DestinationModel.LeisureModel
 import de.dlh.smile.engine.commons
-import de.dlh.smile.engine.commons.{Contexts, LoadedProperties}
-import org.apache.spark.SparkContext
-import org.apache.spark.sql.hive.HiveContext
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import de.dlh.smile.engine.commons.Contexts
+import org.apache.spark.sql.DataFrame
 
 object Main {
 
