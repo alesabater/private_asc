@@ -1,13 +1,13 @@
 package de.dlh.smile.axdelivery.DestinationModel
 
 import de.dlh.smile.axdelivery.Stub
-import org.scalatest.{FlatSpec, Matchers}
-import de.dlh.smile.axdelivery.DestinationModel.DataFrameCommons._
+import de.dlh.smile.axdelivery.commons.DataFrameOperations._
+import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
-import de.dlh.smile.engine.commons.Contexts
+import org.scalatest.{FlatSpec, Matchers}
 
-class DataFrameCommonsTest extends FlatSpec with Matchers {
+class DataFrameOperationsTest extends FlatSpec with Matchers {
 
 	"getBFTUDEPField" should "create a column with the BFTUDEP column" in {
 		val df = Stub.dfMapDate

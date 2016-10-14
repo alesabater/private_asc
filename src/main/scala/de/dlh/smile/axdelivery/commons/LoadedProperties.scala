@@ -1,13 +1,11 @@
-package de.dlh.smile.axdelivery
+package de.dlh.smile.axdelivery.commons
 
 import java.util.Map.Entry
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigObject, ConfigValue}
 
+import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import java.util.Map.Entry
-
-import collection.JavaConversions._
 
 object LoadedProperties {
 
@@ -23,10 +21,22 @@ object LoadedProperties {
 
   lazy val recommendation_conf = ConfigFactory.load("recommendationModel")
 
+
   def fromMapColumns = recommendation_conf.getStringList("dataframe.select.map_columns").toList
   def webtrendsColumns = recommendation_conf.getStringList("dataframe.select.webtrends").toList
   def originCities = recommendation_conf.getStringList("originCities").toList
 
+
+  // Filtering Properties
+  //
+  //////////////////////////////////////////////////////////////
+  //                                                          //
+  //     Only leisure filtering model related properties      //
+  //                                                          //
+  //////////////////////////////////////////////////////////////
+
   def leisureModelColumns = recommendation_conf.getStringList("leisure_model.columns_order").toList
+
+  //def leisureModelColumns = recommendation_conf.getStringList("leisure_model.columns_order").toList
   
 }

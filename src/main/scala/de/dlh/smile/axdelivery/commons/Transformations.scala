@@ -1,18 +1,33 @@
-package de.dlh.smile.axdelivery.DestinationModel
+package de.dlh.smile.axdelivery.commons
 
-
-
+import DataFrameColumnsOperations._
 import org.apache.spark.Logging
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.joda.time.LocalDateTime
 import org.joda.time.format.DateTimeFormat
+import de.dlh.smile.axdelivery.commons.DataFrameColumnsOperations._
+import de.dlh.smile.axdelivery.commons.DataFrameOperations._
 
 import scala.util.{Failure, Success, Try}
 
 
 
 object Transformations extends Logging{
+
+  def formatWebtrendsData(dfWebtrends: DataFrame, dfAirport: DataFrame): DataFrame = {
+    dfWebtrends.filterPartitionFieldsOneYearFrom()
+      .filterValueMapEquals("cs_uri_query", "Screen", "FOFP")
+      .getBFTUDEPField("date_dt", "cs_uri_query", "BFDepDate", "yyyyMMdd")
+      .flatMapType("cs_uri_query", LoadedProperties.fromMapColumns)
+      .select(LoadedProperties.webtrendsColumns.map(col(_)): _*)
+      .withColumn("BFO", udfGetFirstIATA(col("BFO")))
+      .withColumn("BFD", udfGetFirstIATA(col("BFD")))
+      .airportToCityCode(dfAirport, "BFO")
+      .airportToCityCode(dfAirport, "BFD")
+      .filterOrigin()
+      .filterRT()
+  }
 
   def getFirstIATA(iataString: String) = iataString match {
     case null => None

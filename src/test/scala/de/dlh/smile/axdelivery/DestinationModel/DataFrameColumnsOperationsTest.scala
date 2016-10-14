@@ -1,14 +1,13 @@
 package de.dlh.smile.axdelivery.DestinationModel
 
-import de.dlh.smile.axdelivery.{Stub, TestSets}
-import org.scalatest.{FlatSpec, Matchers}
-import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
+import de.dlh.smile.axdelivery.Stub
 import de.dlh.smile.engine.commons.Contexts
+import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Row}
-import org.joda.time.LocalDate
+import org.scalatest.{FlatSpec, Matchers}
+import de.dlh.smile.axdelivery.commons.DataFrameColumnsOperations._
 
-class ColumnCommonsTest extends FlatSpec with Matchers {
+class DataFrameColumnsOperationsTest extends FlatSpec with Matchers {
 
   "udfGetStringDateFormatted" should "get the specified segment of the date from a String date" in {
     val df = Stub.dfStringDate

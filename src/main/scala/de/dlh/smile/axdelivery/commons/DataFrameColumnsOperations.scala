@@ -1,13 +1,10 @@
-package de.dlh.smile.axdelivery.DestinationModel
+package de.dlh.smile.axdelivery.commons
 
 import org.apache.spark.Logging
 import org.apache.spark.sql.functions._
-import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
-import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
+import org.joda.time.LocalDateTime
 
-import scala.util.{Failure, Success, Try}
-
-object ColumnCommons extends Enumeration with Logging {
+object DataFrameColumnsOperations extends Enumeration with Logging {
 
   def getDayOfTheWeek: ((String, String) => Option[Int]) = (date: String, format: String) => Transformations.createDateFrom(date,format)((date: LocalDateTime) => date.getDayOfWeek)
   def udfGetDayOfTheWeek = udf(getDayOfTheWeek)

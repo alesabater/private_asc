@@ -1,15 +1,13 @@
-package de.dlh.smile.axdelivery.DestinationModel
+package de.dlh.smile.axdelivery.commons
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.joda.time.DateTime
-import de.dlh.smile.axdelivery.DestinationModel.ColumnCommons._
-import de.dlh.smile.axdelivery.LoadedProperties
-import org.apache.spark.sql.types.StringType
+import de.dlh.smile.axdelivery.commons.DataFrameColumnsOperations._
 
 import scala.util.{Failure, Success, Try}
 
-object DataFrameCommons {
+object DataFrameOperations {
   // DataFrame Conversions
   implicit def dataFrame2dataFrameUpdatable(df: DataFrame): DataFrameUpdatable = DataFrameUpdatable(df)
 
@@ -18,7 +16,7 @@ object DataFrameCommons {
 
 case class DataFrameUpdatable(df: DataFrame) {
 
-  import DataFrameCommons._
+  import DataFrameOperations._
 
   def filterValueMapEquals(column: String, key: String, value: String): DataFrameUpdatable = {
     df.filter(col(column).getItem(key) === value)

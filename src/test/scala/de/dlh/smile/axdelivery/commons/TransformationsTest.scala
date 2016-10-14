@@ -1,19 +1,17 @@
-package de.dlh.smile.axdelivery.DestinationModel
+package de.dlh.smile.axdelivery.commons
 
 import de.dlh.smile.axdelivery.Stub
-import org.apache.spark.sql.Row
-import org.scalatest.{FlatSpec, Matchers}
-
 import de.dlh.smile.engine.commons.Contexts
-import de.dlh.smile.axdelivery.DestinationModel.Transformations._
+import org.scalatest.{FlatSpec, Matchers}
+import de.dlh.smile.axdelivery.commons.Transformations._
 
 
 class TransformationsTest extends FlatSpec with Matchers {
   
-  "formatAndRegister" should "format and register data frame" in {
+  "formatWebtrendsData" should "format and register data frame" in {
     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
     val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
-    val dfResult = LeisureModel.formatAndRegisterDataFrame(df, dfAirportMap)
+    val dfResult = Transformations.formatWebtrendsData(df, dfAirportMap)
     dfResult.show()
   }
 

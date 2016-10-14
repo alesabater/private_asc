@@ -1,18 +1,26 @@
 package de.dlh.smile.axdelivery
 
-import de.dlh.smile.axdelivery.DestinationModel.LeisureModel
-import de.dlh.smile.engine.commons
+import de.dlh.smile.axdelivery.commons.Transformations
+import de.dlh.smile.axdelivery.models.LeisureFiltering
+import de.dlh.smile.engine.commons.{LoadedProperties => EngineLoadedProperties}
 import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.DataFrame
 
 object Main {
 
-  def main(io: IO) {
-    execute(io.read, io)
+  def main(args: Array[String]) {
+    execute(new IO())
   }
 
-  def execute(df: DataFrame, io: IO): DataFrame = {
-    LeisureModel.cleanData(df,io)
+  def execute(io: IO): DataFrame = {
+
+    val dfWebtrends = io.readWebtrendsData
+    val dfAirportCity = io.readAirportCityMapping
+    val dfWebtrendsFormatted = Transformations.formatWebtrendsData(dfWebtrends, dfAirportCity)
+    dfWebtrendsFormatted
+    val dfFilteredByLeisure = LeisureFiltering.filter(dfWebtrendsFormatted)
+    dfFilteredByLeisure
+
     /*
      *     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
     val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
@@ -31,9 +39,9 @@ object Main {
 
 class IO {
 
-  val conf = commons.LoadedProperties.conf
-  val inputPath = conf.getString("weblogs.path")
-  val airportCodesPath = conf.getString("airport_codes.path")
-  def readAirportCodes: DataFrame = Contexts.sqlCtx.read.json(airportCodesPath)
-  def read: DataFrame = Contexts.sqlCtx.read.parquet(inputPath)
+  val conf = EngineLoadedProperties.conf
+  val webtrendsInputPath = conf.getString("weblogs.path")
+  val airportCityInputPath = conf.getString("airport_codes.path")
+  def readAirportCityMapping: DataFrame = Contexts.sqlCtx.read.json(airportCityInputPath)
+  def readWebtrendsData: DataFrame = Contexts.sqlCtx.read.parquet(webtrendsInputPath)
 }
