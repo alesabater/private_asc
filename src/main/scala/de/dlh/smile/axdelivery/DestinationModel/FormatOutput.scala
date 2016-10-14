@@ -11,13 +11,20 @@ object FormatOutput {
       concatCol: String = "BFD",
       rowCol: String = "BFO"): DataFrame = {
 		// get distinct days from data (this assumes there are not too many of them):
-		val distinctValues: Array[Integer] = df.select(pivotCol)
-    .distinct()
-    .collect()
-    .map(_.getAs[Integer](pivotCol))
+//		val distinctValues: Array[Integer] = df.select(pivotCol)
+//    .distinct()
+//    .collect()
+//    .map(_.getAs[Integer](pivotCol))
+//    
+    val distinctValues = Array(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+    
+    val dfRenamend = df.select(
+        col(pivotCol),
+        col(concatCol),
+        col(rowCol).alias("origin"))
     
     // add column for each day with the Sale value if days match:
-    val withDayColumns = distinctValues.foldLeft(df) { 
+    val withDayColumns = distinctValues.foldLeft(dfRenamend) { 
       case (data, dvalue) => data.selectExpr("*", s"IF($pivotCol = $dvalue, $concatCol, '') AS _$dvalue")
     }
 		
@@ -53,7 +60,7 @@ object FormatOutput {
 		val dfResult = withDayColumns
      .drop(pivotCol)
      .drop(concatCol)
-     .groupBy(rowCol)
+     .groupBy(col("origin"))
      .agg(arrayfunctions.head, arrayfunctions.tail:_*)
 
 		dfResult
