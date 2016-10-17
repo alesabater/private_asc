@@ -1,5 +1,7 @@
 package de.dlh.smile.axdelivery
 
+import java.sql.Timestamp
+
 import de.dlh.smile.engine.commons.Contexts
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
@@ -23,6 +25,8 @@ object Stub {
   val dfCustomerSales = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.customerSalesSeq), Schemas.customerSalesSchema)
 	val dfWebtendsAfterFormat = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.webtrendsAfterFormatSeq), Schemas.webtrendsAfterFormatSchema)
 	val dfResultRecommendation = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.resultRecommendationSeq), Schemas.resultRecommendationSchema)
+  val dfWebtrendsFormatted = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.webtrendsDataFormatted), Schemas.webtrendsFormattedSchema)
+  val dfWebtrendsRelevantInfo = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.webtrendsDataRelevantInfo), Schemas.webtrendsRelevantinfoSchema)
 }
 
 
@@ -230,6 +234,25 @@ object TestSets {
       Row("BER", "GEN", 11),
       Row("BER", "GIN", 12)
       )
+
+  val webtrendsDataFormatted = Seq(
+    Row("RT", 34, "20160102", new Timestamp(115,11,15,20,15,0,0), "20151219", "14", "Mozilla/5.0+(Windows+NT+6.1;+WOW64;+rv:47.0)+Gecko/20100101+Firefox/47.0", "Direct%20Traffic", "en", "IK;IK", "0", "FOFP", 2015, 11, 15, "1f3935e6-ae76-410", "SHA", "MIL"),
+    Row("OW", 21, "20160707", new Timestamp(116,1,2,10,65,0,0), "20151219", "24", "Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_11_6)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/39.0.2171.95+Safari/537.36", "Direct%20Traffic", "en", "IK;IK", "0", "FOFP", 2015, 11, 15, "1f3935e6-ae76-410", "BCN", "MIL"),
+    Row("RT", 15, "20160506", new Timestamp(116,2,7,18,45,0,0), "20151219", "33", "Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_7_5)+AppleWebKit/534.57.7+(KHTML,+like+Gecko)+Version/5.1.7+Safari/534.57.7", "Direct%20Traffic", "es", "IK;IK", "0", "FOFP", 2015, 11, 15, "1f3935e6-ae76-410", "MAD", "MIL"),
+    Row("RT", 11, "20160212", new Timestamp(116,1,1,16,25,0,0), "20151219", "11", "Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_11_1)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/51.0.2704.84+Safari/537.36", "Direct%20Traffic", "de", "IK;IK", "2", "FOFP", 2015, 11, 15, "1f3935e6-ae76-410", "DUB", "MIL"),
+    Row("RT", 40, "20160322", new Timestamp(115,9,10,13,25,0,0), "20151219", "12", "Mozilla/5.0+(Windows+NT+10.0;+WOW64;+rv:47.0)+Gecko/20100101+Firefox/47.0+TO-Browser/TOB7.47.0.111_03", "www.google.it", "de", "K;K", "0", "FOFP", 2015, 11, 15, "1f3935e6-ae76-410", "FRA", "MIL"),
+    Row("RT", 23, "20160513", new Timestamp(116,3,18,10,35,0,0), "20151219", "20", "Mozilla/5.0+(Windows+NT+10.0;+WOW64;+rv:47.0)+Gecko/20100101+Firefox/47.0+TO-Browser/TOB7.47.0.111_03", "www.google.it", "en", "IK;K", "1", "FOFP", 2015, 11, 15, "1f3935e6-ae76-410", "ZCH", "MIL")
+  )
+
+
+  val webtrendsDataRelevantInfo = Seq(
+    Row("RT", 34, 6, 2, 20, 6, "3-4w", "Firefox", "Windows", "Direct", "English", "IK", "0", 2015, 11, "SHA", "MIL"),
+    Row("OW", 21, 4, 2, 11, 6, "3-4w", "Chrome", "Other", "Direct", "English", "IK", "0", 2015, 11, "BCN", "MIL"),
+    Row("RT", 15, 5, 1, 18, 6, ">4w", "Safari", "Other", "Direct", "Other", "IK", "0", 2015, 11, "MAD", "MIL"),
+    Row("RT", 11, 5, 1, 16, 6, "1-2w", "Chrome", "Other", "Direct", "Deutsch", "IK", "2", 2015, 11, "DUB", "MIL"),
+    Row("RT", 40, 2, 6, 13, 6, "1-2w", "Firefox", "Windows", "Google", "Deutsch", "K", "0", 2015, 11, "FRA", "MIL"),
+    Row("RT", 23, 5, 1, 10, 6, "3-4w", "Firefox", "Windows", "Google", "English", "IK", "1", 2015, 11, "ZCH", "MIL")
+  )
 }
 
 object Schemas {
@@ -291,5 +314,46 @@ object Schemas {
       StructField("BFO", StringType, true),
       StructField("BFD", StringType, true),
       StructField("mdlrank", IntegerType, true)
+  ))
+
+  val webtrendsFormattedSchema = StructType(Seq(
+    StructField("BFTripType", StringType, true),
+    StructField("BFTuDep", IntegerType, true),
+    StructField("BFRetDate", StringType, true),
+    StructField("date_dt", TimestampType, true),
+    StructField("BFDepDate", StringType, true),
+    StructField("BFDurStay", StringType, true),
+    StructField("cs_user", StringType, true),
+    StructField("ed_refdom", StringType, true),
+    StructField("Language", StringType, true),
+    StructField("BFT", StringType, true),
+    StructField("ed_age", StringType, true),
+    StructField("Screen", StringType, true),
+    StructField("year", IntegerType, true),
+    StructField("month", IntegerType, true),
+    StructField("day", IntegerType, true),
+    StructField("session_guid", StringType, true),
+    StructField("BFO", StringType, true),
+    StructField("BFD", StringType, true)
+  ))
+
+  val webtrendsRelevantinfoSchema = StructType(Seq(
+    StructField("bf_trip_type", StringType, true),
+    StructField("bf_tu_dep", IntegerType, true),
+    StructField("bf_ret_date", IntegerType, true),
+    StructField("date_dt_day", IntegerType, true),
+    StructField("date_dt_hour", IntegerType, true),
+    StructField("bf_dep_date", IntegerType, true),
+    StructField("bf_dur_stay", StringType, true),
+    StructField("cs_user_browser", StringType, true),
+    StructField("cs_user_os", StringType, true),
+    StructField("ed_refdom", StringType, true),
+    StructField("language", StringType, true),
+    StructField("bft", StringType, true),
+    StructField("ed_age", StringType, true),
+    StructField("year", IntegerType, true),
+    StructField("month", IntegerType, true),
+    StructField("BFO", StringType, true),
+    StructField("BFD", StringType, true)
   ))
 }

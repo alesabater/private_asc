@@ -17,9 +17,7 @@ object Main {
     val dfWebtrends = io.readWebtrendsData
     val dfAirportCity = io.readAirportCityMapping
     val dfWebtrendsFormatted = Transformations.formatWebtrendsData(dfWebtrends, dfAirportCity)
-    dfWebtrendsFormatted
-    val dfFilteredByLeisure = LeisureFiltering.filter(dfWebtrendsFormatted)
-    dfFilteredByLeisure
+    LeisureFiltering.filter(dfWebtrendsFormatted)
 
     /*
      *     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)

@@ -70,15 +70,17 @@ object Transformations extends Logging{
   }
 
   def getDurationStay(durstayString: String) = {
-    // TODO: if this value is not possible to turn into a String it will fail
-    val durStay = durstayString.toInt
+    val durStay = Try(durstayString.toInt) match {
+      case Success(s) => s
+      case Failure(f) => -1
+    }
     if (durStay == 1) "1d"
     else if (durStay >=2 & durStay <= 3) "2-3d"
     else if (durStay >=4 & durStay <= 6) "4-6d"
     else if (durStay >=7 & durStay <= 13) "1-2w"
     else if (durStay >=14 & durStay <= 27) "3-4w"
     else if (durStay >=28) ">4w"
-    else ""
+    else "Other"
   }
 
   def getBrowserName(cs_userString: String) = {
@@ -111,7 +113,7 @@ object Transformations extends Logging{
     else "Other"
   }
 
-  def getType(referrerString: String) = {
+  def getBftType(referrerString: String) = {
     if (referrerString.indexOf("IK") != -1 ) "IK"
     else if (referrerString.indexOf("K") != -1) "K"
     else "Other"

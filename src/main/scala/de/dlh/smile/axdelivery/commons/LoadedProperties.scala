@@ -36,7 +36,18 @@ object LoadedProperties {
   //////////////////////////////////////////////////////////////
 
   def leisureModelColumns = recommendation_conf.getStringList("leisure_model.columns_order").toList
-
+  def bfTripTypeScores = createMap("leisure_model.coeficients.bf_trip_type", recommendation_conf)
+  def bfTuDepScores = createMap("leisure_model.coeficients.bf_tu_dep", recommendation_conf)
+  def bfRetRateScores = createMap("leisure_model.coeficients.bf_ret_rate", recommendation_conf)
+  def dateDtWeekScores = createMap("leisure_model.coeficients.date_dt_week", recommendation_conf)
+  def bfDepDateScores = createMap("leisure_model.coeficients.bf_dep_date", recommendation_conf)
+  def dateDtHourScores = createMap("leisure_model.coeficients.date_dt_hour", recommendation_conf)
+  def bfDurStayScores = createMap("leisure_model.coeficients.bf_dur_stay", recommendation_conf)
+  def userBrowserScores = createMap("leisure_model.coeficients.user_browser", recommendation_conf)
+  def userOsScores = createMap("leisure_model.coeficients.user_os", recommendation_conf)
+  def edRefDomScores = createMap("leisure_model.coeficients.ed_ref_dom", recommendation_conf)
+  def languageScores = createMap("leisure_model.coeficients.language", recommendation_conf)
+  def bftScores = createMap("leisure_model.coeficients.bft", recommendation_conf)
   //def leisureModelColumns = recommendation_conf.getStringList("leisure_model.columns_order").toList
   
 }

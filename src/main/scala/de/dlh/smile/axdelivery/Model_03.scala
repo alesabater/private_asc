@@ -153,7 +153,7 @@
 //                        when (instr( ed_refdom , 'Direct') > 0 or instr( ed_refdom , 'lufthansa') > 0 or instr( ed_refdom , 'miles-and-more') > 0) then 0 else 0.394189713 end, 0) as ed_refdomScore ,
 //          coalesce(case when  Language  like 'en%' then 0.215854591
 //                        when  Language  like 'de%' then 0 else 0.24643095 end, 0) as LanguageScore ,
-//          coalesce(case when instr( BFT , 'IK') > 0 then -0.614505492
+//          coalesce(case when instr( BFT , 'IK') > 0 then -0.6145054z92
 //                           when instr( BFT , 'K') > 0 then 0.947487761 end, 0) as BFTScore ,
 //          coalesce(case when  ed_age  > 0 then -0.391163038 end, 0) as ed_ageScore
 //        from data

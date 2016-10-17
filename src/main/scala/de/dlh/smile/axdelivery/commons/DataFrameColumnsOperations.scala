@@ -22,5 +22,5 @@ object DataFrameColumnsOperations extends Enumeration with Logging {
   val udfGetReferrerCat = udf((referrer: String) => Transformations.getReferrerCat(referrer))
   val udfGetFirstIATA = udf((iataString: String) => Transformations.getFirstIATA(iataString))
   val udfGetLanguage = udf((language: String) => Transformations.getLanguage(language))
-  val udfGetType = udf((typ: String) => Transformations.getType(typ))
+  val udfGetBftType = udf((typ: String) => Transformations.getBftType(typ))
 }
