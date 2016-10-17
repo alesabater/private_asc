@@ -32,7 +32,7 @@ object DestinationRecommender {
       .select(col("current_BFO").alias("factor_BFO"),
         col("current_BFD").alias("factor_BFD"),
         (col("current_freq") / col("last_freq")).alias("factor"),
-        col("last_year").alias("factor_year"))
+        col("last_year").alias("factor_year")).distinct()
 
     val dfResult = yearFactor.rdd.isEmpty() match {
       case true => df.select(col("BFO"),
@@ -119,7 +119,7 @@ object DestinationRecommender {
       .partitionBy(col("BFO"), col("year"), col("month"))
       .orderBy(col("mdlrank"))
     val dfResult = dfResultScoring
-      .withColumn("mdlrank", rank over byOriginMdlRank)
+      .withColumn("mdlrank", rowNumber over byOriginMdlRank)
       .filter("mdlrank <= 16")
       .select(col("BFO"), col("BFD"), col("year"), col("month"), (col("mdlrank") - 1).alias("mdlrank"))
 
@@ -131,13 +131,20 @@ object DestinationRecommender {
                    concatCol: String = "BFD",
                    rowCol: String = "BFO"): DataFrame = {
     // get distinct days from data (this assumes there are not too many of them):
-    val distinctValues: Array[Integer] = df.select(pivotCol)
-      .distinct()
-      .collect()
-      .map(_.getAs[Integer](pivotCol))
+    //		val distinctValues: Array[Integer] = df.select(pivotCol)
+    //    .distinct()
+    //    .collect()
+    //    .map(_.getAs[Integer](pivotCol))
+    //
+    val distinctValues = Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+
+    val dfRenamend = df.select(
+      col(pivotCol),
+      col(concatCol),
+      col(rowCol).alias("origin"))
 
     // add column for each day with the Sale value if days match:
-    val withDayColumns = distinctValues.foldLeft(df) {
+    val withDayColumns = distinctValues.foldLeft(dfRenamend) {
       case (data, dvalue) => data.selectExpr("*", s"IF($pivotCol = $dvalue, $concatCol, '') AS _$dvalue")
     }
 
@@ -172,7 +179,7 @@ object DestinationRecommender {
     val dfResult = withDayColumns
       .drop(pivotCol)
       .drop(concatCol)
-      .groupBy(rowCol)
+      .groupBy(col("origin"))
       .agg(arrayfunctions.head, arrayfunctions.tail: _*)
 
     dfResult
