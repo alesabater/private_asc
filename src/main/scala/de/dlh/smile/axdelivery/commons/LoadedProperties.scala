@@ -19,7 +19,7 @@ object LoadedProperties {
     } yield (key, value)).toMap
   }
 
-  lazy val recommendation_conf = ConfigFactory.load("recommendationModel")
+  val recommendation_conf = ConfigFactory.load("recommendationModel")
 
 
   def fromMapColumns = recommendation_conf.getStringList("dataframe.select.map_columns").toList

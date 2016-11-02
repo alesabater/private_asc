@@ -5,97 +5,94 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
 import de.dlh.smile.axdelivery.commons.DataFrameOperations._
+import de.dlh.smile.engine.commons.Contexts
 
 
 object DestinationRecommender {
 
-  def recommend(df: DataFrame): DataFrame = ???
+  def recommend(df: DataFrame): DataFrame = {
+    val dfGrouped = df.groupBy("bfo", "bfd", "year", "month").agg(countDistinct("session_guid").alias("freq"))
+    val dfScaled = scaleWithPreviousYear(dfGrouped)
+    val dfMovingAvg = getMovingAverage(dfScaled)
+    val dfDestinations = getRecommendedDestinations(dfMovingAvg)
+    formatOutput(dfDestinations)
+  }
 
   def scaleWithPreviousYear(df: DataFrame): DataFrame = {
-    val year = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("year")).first().getInt(0)
-    val month = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).select(col("month")).first().getInt(0)
-    val currentMonth = df.filter((col("year") === year + 1) and (col("month") === month))
-      .select(col("BFO").alias("current_BFO"),
-        col("BFD").alias("current_BFD"),
+    val oldYearMonth = df.select(col("year"), col("month")).distinct().sort(col("year"), col("month")).first()
+    val oldYear = oldYearMonth.getInt(0)
+    val oldMonth = oldYearMonth.getInt(1)
+    val currentMonth = df.filter((col("year") === oldYear + 1) and (col("month") === oldMonth))
+      .select(col("bfo").alias("current_bfo"),
+        col("bfd").alias("current_bfd"),
         col("year").alias("current_year"),
         col("month").alias("current_month"),
         col("freq").alias("current_freq"))
-    val lastYearMonth = df.filter((col("year") === year) and (col("month") === month))
-      .select(col("BFO").alias("last_BFO"),
-        col("BFD").alias("last_BFD"),
+    val lastYearMonth = df.filter((col("year") === oldYear) and (col("month") === oldMonth))
+      .select(col("bfo").alias("last_bfo"),
+        col("bfd").alias("last_bfd"),
         col("year").alias("last_year"),
         col("month").alias("last_month"),
         col("freq").alias("last_freq"))
     val yearFactor = currentMonth.join(lastYearMonth,
-      (currentMonth("current_BFO") === lastYearMonth("last_BFO")) and (currentMonth("current_BFD") === lastYearMonth("last_BFD")),
-      "inner")
-      .select(col("current_BFO").alias("factor_BFO"),
-        col("current_BFD").alias("factor_BFD"),
+      (currentMonth("current_bfo") === lastYearMonth("last_bfo")) and (currentMonth("current_bfd") === lastYearMonth("last_bfd")), "inner")
+      .select(col("current_bfo").alias("factor_bfo"),
+        col("current_bfd").alias("factor_bfd"),
         (col("current_freq") / col("last_freq")).alias("factor"),
         col("last_year").alias("factor_year")).distinct()
 
     val dfResult = yearFactor.rdd.isEmpty() match {
-      case true => df.select(col("BFO"),
-        col("BFD"),
+      case true => df.select(col("bfo"),
+        col("bfd"),
         col("year"),
         col("month"),
         col("freq"))
-      case false => df.filter((col("year") !== year) or (col("month") !== month))
+      case false => df.filter((col("year") !== oldYear) or (col("month") !== oldMonth))
         .join(yearFactor,
-          (df("year") === yearFactor("factor_year")) and (df("BFO") === yearFactor("factor_BFO")) and (df("BFD") === yearFactor("factor_BFD")),
+          (df("year") === yearFactor("factor_year")) and (df("bfo") === yearFactor("factor_bfo")) and (df("bfd") === yearFactor("factor_bfd")),
           "left")
-        .select(col("BFO"),
-          col("BFD"),
+        .select(col("bfo"),
+          col("bfd"),
           col("year"),
           col("month"),
-          //col("freq"),
-          //col("factor"),
           (col("freq") * coalesce(col("factor"), lit(1))).alias("freq"))
     }
-
     dfResult
   }
 
   def getMovingAverage(df: DataFrame): DataFrame = {
     // Compute number of searches per OnD, year and month
-    val dfTmp = df
-      .select("BFO", "BFD", "year", "month", "session_guid")
-      .groupBy("BFO", "BFD", "year", "month")
-      .agg(countDistinct("session_guid").alias("freq"))
-
-    // Scale based in last year data
-    val dfScaledTmp = scaleWithPreviousYear(dfTmp)
 
     // The months of Jan and Dec do not have enough data points to compute the moving average
     // for that reason we add month 0 (same as Dec) and month 13 (same as Jan) for the computations
-    val dfTmpEnlarged = dfScaledTmp.unionAll(
-      dfScaledTmp.filter(col("month") === 12).select(col("BFO"), col("BFD"), (col("year") + 1).alias("year"), lit(0).alias("month"), col("freq")))
-      .unionAll(dfScaledTmp.filter(col("month") === 1).select(col("BFO"), col("BFD"), (col("year") - 1).alias("year"), lit(13).alias("month"), col("freq")))
+    val dfTmpEnlarged = df.unionAll(
+      df.filter(col("month") === 12).select(col("bfo"), col("bfd"), (col("year") + 1).alias("year"), lit(0).alias("month"), col("freq")))
+      .unionAll(df.filter(col("month") === 1).select(col("bfo"), col("bfd"), (col("year") - 1).alias("year"), lit(13).alias("month"), col("freq")))
 
     // Compute the moving average 1/4, 1/2, 1/4
-    val windowSpec = Window.partitionBy(col("BFO"), col("BFD")).orderBy(col("month")).rangeBetween(-1, 1)
-    val moving_average = sum(col("freq")).over(windowSpec)
+    val windowSpec = Window.partitionBy(col("bfo"), col("bfd")).orderBy(col("month")).rangeBetween(-1, 1)
+
     val dfResult = dfTmpEnlarged.select(
-      col("BFO"),
-      col("BFD"),
+      col("bfo"),
+      col("bfd"),
       col("year"),
       col("month"),
-      col("freq"),
-      moving_average.alias("smoothedfreq"))
-      .select(col("BFO"),
-        col("BFD"),
+      col("freq"))
+      .withColumn("smoothedfreq", CustomSum(col("freq")).over(windowSpec))
+      .select(col("bfo"),
+        col("bfd"),
         col("year"),
         col("month"),
         ((col("smoothedfreq") + col("freq")) / 4).alias("freq")
-      )
-      .filter((col("month") >= 1) and col("month") <= 12) // remove the fake months that we added
+      ).filter((col("month") >= 1) and col("month") <= 12) // remove the fake months that
+
     dfResult
   }
 
   def getRecommendedDestinations(df: DataFrame): DataFrame = {
     // Compute the rank and keep up to rank 50
     val byOrigin = Window
-      .partitionBy(col("BFO"), col("year"), col("month"))
+      .partitionBy(col("bfo"), col("year"), col("month"))
       .orderBy(-col("freq"))
     val dfRankedByO = df
       .withColumn("rank", rank over byOrigin)
@@ -103,7 +100,7 @@ object DestinationRecommender {
 
     // Compute month rank by origin and destination pair (need the full year for this)
     val byOnD = Window
-      .partitionBy(col("BFO"), col("BFD"))
+      .partitionBy(col("bfo"), col("bfd"))
       .orderBy(-col("freq"))
     val dfRankedByOnD = dfRankedByO
       .withColumn("monthrank", rank over byOnD)
@@ -114,22 +111,22 @@ object DestinationRecommender {
     val dfRankedPredictionMonth = dfRankedByOnD.filterPartitionFieldsOneMonth(yearPred, monthPred)
 
     // Compute the model rank as a combination of the previous two & filter keeping only the top 16
-    val dfResultScoring = dfRankedPredictionMonth.select(col("BFO"), col("BFD"), col("year"), col("month"), (col("rank") + col("monthrank") * col("monthrank")).alias("mdlrank"))
+    val dfResultScoring = dfRankedPredictionMonth.select(col("bfo"), col("bfd"), col("year"), col("month"), (col("rank") + col("monthrank") * col("monthrank")).alias("mdlrank"))
     val byOriginMdlRank = Window
-      .partitionBy(col("BFO"), col("year"), col("month"))
+      .partitionBy(col("bfo"), col("year"), col("month"))
       .orderBy(col("mdlrank"))
     val dfResult = dfResultScoring
       .withColumn("mdlrank", rowNumber over byOriginMdlRank)
       .filter("mdlrank <= 16")
-      .select(col("BFO"), col("BFD"), col("year"), col("month"), (col("mdlrank") - 1).alias("mdlrank"))
+      .select(col("BFO"), col("bfd"), col("year"), col("month"), (col("mdlrank") - 1).alias("mdlrank"))
 
     dfResult
   }
 
   def formatOutput(df: DataFrame,
                    pivotCol: String = "mdlrank",
-                   concatCol: String = "BFD",
-                   rowCol: String = "BFO"): DataFrame = {
+                   concatCol: String = "bfd",
+                   rowCol: String = "bfo"): DataFrame = {
     // get distinct days from data (this assumes there are not too many of them):
     //		val distinctValues: Array[Integer] = df.select(pivotCol)
     //    .distinct()
@@ -228,7 +225,76 @@ object DestinationRecommender {
     def evaluate(buffer: Row) = {
       buffer.getString(0).replaceAll("^;+", "").replaceAll(";+$", "").replaceAll(";+", ";")
     }
+  }
+
+}
+
+object CustomSum extends UserDefinedAggregateFunction {
+
+  // Input Data Type Schema
+  def inputSchema: StructType = StructType(Array(StructField("item", DoubleType)))
+
+  // Intermediate Schema
+
+  def bufferSchema = StructType(Array(
+
+    StructField("sum", DoubleType)
+
+  ))
+
+
+
+  // Returned Data Type .
+
+  def dataType: DataType = DoubleType
+
+
+
+  // Self-explaining
+
+  def deterministic = true
+
+
+
+  // This function is called whenever key changes
+
+  def initialize(buffer: MutableAggregationBuffer) = {
+
+    buffer(0) = 0.toDouble // set sum to zero
 
   }
+
+
+
+  // Iterate over each entry of a group
+
+  def update(buffer: MutableAggregationBuffer, input: Row) = {
+
+    buffer(0) = buffer.getDouble(0) + input.getDouble(0)
+
+  }
+
+
+
+  // Merge two partial aggregates
+
+  def merge(buffer1: MutableAggregationBuffer, buffer2: Row) = {
+
+    buffer1(0) = buffer1.getDouble(0) + buffer2.getDouble(0)
+
+  }
+
+
+
+  // Called after all the entries are exhausted.
+
+  def evaluate(buffer: Row) = {
+
+    buffer.getDouble(0)
+
+  }
+
+
+
 
 }

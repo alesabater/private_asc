@@ -246,12 +246,12 @@ object TestSets {
 
 
   val webtrendsDataRelevantInfo = Seq(
-    Row("RT", 34, 6, 2, 20, 6, "3-4w", "Firefox", "Windows", "Direct", "English", "IK", "0", 2015, 11, "SHA", "MIL"),
-    Row("OW", 21, 4, 2, 11, 6, "3-4w", "Chrome", "Other", "Direct", "English", "IK", "0", 2015, 11, "BCN", "MIL"),
-    Row("RT", 15, 5, 1, 18, 6, ">4w", "Safari", "Other", "Direct", "Other", "IK", "0", 2015, 11, "MAD", "MIL"),
-    Row("RT", 11, 5, 1, 16, 6, "1-2w", "Chrome", "Other", "Direct", "Deutsch", "IK", "2", 2015, 11, "DUB", "MIL"),
-    Row("RT", 40, 2, 6, 13, 6, "1-2w", "Firefox", "Windows", "Google", "Deutsch", "K", "0", 2015, 11, "FRA", "MIL"),
-    Row("RT", 23, 5, 1, 10, 6, "3-4w", "Firefox", "Windows", "Google", "English", "IK", "1", 2015, 11, "ZCH", "MIL")
+    Row("RT", 34, 6, 2, 20, 6, "3-4w", "Firefox", "Windows", "Direct", "English", "IK", "0", 2015, 11, "SHA", "MIL", "1f3935e6-ae76-410"),
+    Row("OW", 21, 4, 2, 11, 6, "3-4w", "Chrome", "Other", "Direct", "English", "IK", "0", 2015, 11, "BCN", "MIL", "1f3935e6-ae76-410"),
+    Row("RT", 15, 5, 1, 18, 6, ">4w", "Safari", "Other", "Direct", "Other", "IK", "0", 2015, 11, "MAD", "MIL", "1f3935e6-ae76-410"),
+    Row("RT", 11, 5, 1, 16, 6, "1-2w", "Chrome", "Other", "Direct", "Deutsch", "IK", "2", 2015, 11, "DUB", "MIL", "1f3935e6-ae76-410"),
+    Row("RT", 40, 2, 6, 13, 6, "1-2w", "Firefox", "Windows", "Google", "Deutsch", "K", "0", 2015, 11, "FRA", "MIL", "1f3935e6-ae76-410"),
+    Row("RT", 23, 5, 1, 10, 6, "3-4w", "Firefox", "Windows", "Google", "English", "IK", "1", 2015, 11, "ZCH", "MIL", "1f3935e6-ae76-410")
   )
 }
 
@@ -299,8 +299,8 @@ object Schemas {
       StructField("month", IntegerType, true),
       StructField("day", IntegerType, true),
       StructField("session_guid", StringType, true),
-      StructField("BFO", StringType, true),
-      StructField("BFD", StringType, true)
+      StructField("bfo", StringType, true),
+      StructField("bfd", StringType, true)
     ))
   val oneColIntSchema = StructType(Seq(
     StructField("one", IntegerType, true)
@@ -354,6 +354,7 @@ object Schemas {
     StructField("year", IntegerType, true),
     StructField("month", IntegerType, true),
     StructField("BFO", StringType, true),
-    StructField("BFD", StringType, true)
+    StructField("BFD", StringType, true),
+    StructField("session_guid", StringType, true)
   ))
 }
