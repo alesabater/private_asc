@@ -4,6 +4,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.joda.time.DateTime
 import de.dlh.smile.axdelivery.commons.DataFrameColumnsOperations._
+import org.apache.spark.Logging
 
 import scala.util.{Failure, Success, Try}
 
@@ -14,12 +15,16 @@ object DataFrameOperations {
   implicit def dataFrameUpdatable2dataFrame(up: DataFrameUpdatable): DataFrame = up.df
 }
 
-case class DataFrameUpdatable(df: DataFrame) {
+case class DataFrameUpdatable(df: DataFrame) extends Logging{
 
   import DataFrameOperations._
 
   def filterValueMapEquals(column: String, key: String, value: String): DataFrameUpdatable = {
-    df.filter(col(column).getItem(key) === value)
+    Try(df.filter(col(column).getItem(key) === value)) match {
+      case Success(s) => s
+      case Failure(f) => {log.warn("Map \"cs_uri_query\" is not a columns, can not filter out of a non existing column")
+      df}
+    }
   }
 
   def filterPartitionFieldsOneYearFrom(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): DataFrameUpdatable = {

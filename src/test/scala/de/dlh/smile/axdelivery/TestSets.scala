@@ -27,6 +27,7 @@ object Stub {
 	val dfResultRecommendation = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.resultRecommendationSeq), Schemas.resultRecommendationSchema)
   val dfWebtrendsFormatted = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.webtrendsDataFormatted), Schemas.webtrendsFormattedSchema)
   val dfWebtrendsRelevantInfo = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.webtrendsDataRelevantInfo), Schemas.webtrendsRelevantinfoSchema)
+  val dfFilterCsUriQuery = Contexts.sqlCtx.createDataFrame(Contexts.sc.parallelize(TestSets.csUriQueryMap), Schemas.csUriQuerySchema)
 }
 
 
@@ -92,32 +93,6 @@ object TestSets {
 			)
 			
 	val webtrendsAfterFormatSeq = Seq(
-//      Row("RT", 49, "20160324", "2015-11-15 18:57:...", "20160103", "81", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 11, 15, "be734313-0a88-40e...", "MAD", "SAO"),
-//      Row("RT", 65, "20160327", "2015-11-15 22:04:...", "20160119", "68", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 11, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
-//      Row("RT", 65, "20160325", "2015-11-15 22:08:...", "20160119", "66", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 11, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
-//      Row("RT", 94, "20160303", "2015-11-15 19:18:...", "20160217", "15", "Mozilla/5.0+(Maci...", "Direct%20Traffic", "en", "IK;IK", "104", "FOFP", 2015, 11, 15, "e4ec7169-2a3d-4c1...", "null", "null"),
-//      Row("RT", 94, "20160303", "2015-11-15 19:24:...", "20160217", "15", "Mozilla/5.0+(Maci...", "Direct%20Traffic", "en", "IK;IK", "104", "FOFP", 2015, 11, 15, "e4ec7169-2a3d-4c1...", "null", "null"),
-//      Row("OW", 94, "20160303", "2015-11-15 19:26:...", "20160217", "15", "Mozilla/5.0+(Maci...", "Direct%20Traffic", "en", "IK;IK", "104", "FOFP", 2015, 11, 15, "e4ec7169-2a3d-4c1...", "null", "null"),
-//      Row("RT", 94, "20160303", "2015-11-15 20:02:...", "20160217", "15", "Mozilla/5.0+(Maci...", "Direct%20Traffic", "en", "IK;IK", "104", "FOFP", 2015, 11, 15, "e4ec7169-2a3d-4c1...", "null", "null"),
-//      Row("RT", 76, "20160214", "2015-11-15 22:59:...", "20160130", "15", "Mozilla/5.0+(Wind...", "Direct%20Traffic", "de", "IK;IK", "0", "FOFP", 2015, 11, 15, "1fe7b6b8-e359-4bd...", "null", "null"),
-//      Row("RT", 77, "20160212", "2015-11-15 14:14:...", "20160131", "12", "Mozilla/5.0+(Wind...", "www.google.de", "de", "IK;IK", "0", "FOFP", 2015, 11, 15, "057e1660-b9cf-41d...", "null", "null"),
-//      Row("RT", 130, "20160410", "2015-11-15 09:22:...", "20160324", "16", "Mozilla/5.0+(Maci...", "www.google.de", "de", "IK;IK", "0", "FOFP", 2015, 11, 15, "e6514a3a-56c9-4c3...", "null", "null"),
-//      Row("RT", 130, "20160411", "2015-11-15 09:23:...", "20160324", "17", "Mozilla/5.0+(Maci...", "www.google.de", "de", "IK;IK", "0", "FOFP", 2015, 11, 15, "e6514a3a-56c9-4c3...", "null", "null"),
-//      Row("RT", 130, "20160410", "2015-11-15 09:28:...", "20160324", "16", "Mozilla/5.0+(Maci...", "www.google.de", "de", "IK;IK", "0", "FOFP", 2015, 11, 15, "e6514a3a-56c9-4c3...", "null", "null"),
-//      Row("RT", 130, "20160410", "2015-11-15 09:29:...", "20160324", "16", "Mozilla/5.0+(Maci...", "www.google.de", "de", "IK;IK", "0", "FOFP", 2015, 11, 15, "e6514a3a-56c9-4c3...", "null", "null"),
-//      Row("RT", 129, "20160328", "2015-11-15 22:32:...", "20160323", "4", "Mozilla/5.0+(Maci...", "Direct%20Traffic", "de", "K;K", "0", "FOFP", 2015, 11, 15, "b9845589-0b99-4f7...", "null", "null"),
-//      Row("RT", 157, "20160504", "2015-11-15 15:38:...", "20160420", "14", "Mozilla/5.0+(Wind...", "www.google.co.il", "en", "IK;IK", "327", "FOFP", 2015, 11, 15, "eb06551f-222e-4e1...", "null", "null"),
-//      Row("RT", 24, "20151210", "2015-11-15 15:58:...", "20151209", "1", "Mozilla/5.0+(Linu...", "Direct%20Traffic", "de", "D;D", "0", "FOFP", 2015, 11, 15, "dcc9f165-e6ae-4aa...", "null", "null"),
-//      Row("RT", 7, "20160116", "2015-11-15 20:05:...", "20160101", "15", "Mozilla/5.0+(X11;...", "Direct%20Traffic", "de", "K;K", "0", "FOFP", 2015, 11, 15, "9da674f4-97f6-441...", "null", "null"),
-//      Row("RT", 1, "20160101", "2015-11-15 23:11:...", "20151116", "46", "Mozilla/5.0+(Wind...", "www.google.pl", "pl", "IK;IK", "0", "FOFP", 2015, 11, 15, "2c782716-e190-412...", "null", "null"),
-//      Row("RT", 121, "20160319", "2015-11-15 11:14:...", "20160315", "4", "Mozilla/5.0+(Wind...", "www.google.fr", "fr", "IK;IK", "4", "FOFP", 2015, 11, 15, "2b67c82b-11ac-4fb...", "null", "null"),
-//      Row("RT", 166, "20160515", "2015-11-15 17:25:...", "20160429", "16", "Mozilla/5.0+(Wind...", "www.google.de", "de", "K;K", "0", "FOFP", 2015, 11, 15, "ff4fa86c-6855-425...", "null", "null"),
-//      Row("RT", 49, "20160324", "2015-12-15 18:57:...", "20160103", "81", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 12, 15, "be734313-0a88-40e...", "MAD", "SAO"),
-//      Row("RT", 65, "20160327", "2015-12-15 22:04:...", "20160119", "68", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 12, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
-//      Row("RT", 65, "20160325", "2015-12-15 22:08:...", "20160119", "66", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 12, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
-//      Row("RT", 49, "20160324", "2015-10-15 18:57:...", "20160103", "81", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 10, 15, "be734313-0a88-40e...", "MAD", "SAO"),
-//      Row("RT", 65, "20160327", "2015-10-15 22:04:...", "20160119", "68", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 10, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
-//      Row("RT", 65, "20160325", "2015-10-15 22:08:...", "20160119", "66", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 10, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
       Row("RT", 49, "20160324", "2015-1-15 18:57:...", "20160103", "81", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 1, 15, "be734313-0a88-40e...", "MAD", "SAO"),
       Row("RT", 65, "20160327", "2015-1-15 22:04:...", "20160119", "68", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 1, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
       Row("RT", 65, "20160325", "2015-1-15 22:08:...", "20160119", "66", "Mozilla/5.0+(Wind...", "www.google.it", "it", "IK;IK", "0", "FOFP", 2015, 1, 15, "187c293b-3c58-45e...", "FRA", "SAO"),
@@ -253,6 +228,15 @@ object TestSets {
     Row("RT", 40, 2, 6, 13, 6, "1-2w", "Firefox", "Windows", "Google", "Deutsch", "K", "0", 2015, 11, "FRA", "MIL", "1f3935e6-ae76-410"),
     Row("RT", 23, 5, 1, 10, 6, "3-4w", "Firefox", "Windows", "Google", "English", "IK", "1", 2015, 11, "ZCH", "MIL", "1f3935e6-ae76-410")
   )
+
+  val csUriQueryMap = Seq(
+    Row("RT", 34, 6, 2, 20, 6, Map("Screen" -> "FOFP")),
+    Row("OW", 21, 4, 2, 11, 6, Map("Screen" -> "FOFP")),
+    Row("RT", 15, 5, 1, 18, 6, Map("Screen" -> "NA")),
+    Row("RT", 11, 5, 1, 16, 6, Map("Screen" -> "FOFP")),
+    Row("RT", 40, 2, 6, 13, 6, Map("Screen" -> "NA")),
+    Row("RT", 23, 5, 1, 10, 6, Map("Screen" -> "FOFP"))
+  )
 }
 
 object Schemas {
@@ -274,6 +258,16 @@ object Schemas {
 			StructField("date_prev", StringType, true),
 			StructField("date_dep", MapType(StringType,StringType,true), true)
 			))
+
+  val csUriQuerySchema = StructType(Seq(
+    StructField("1", StringType, true),
+    StructField("2", IntegerType, true),
+    StructField("3", IntegerType, true),
+    StructField("4", IntegerType, true),
+    StructField("5", IntegerType, true),
+    StructField("6", IntegerType, true),
+    StructField("cs_uri_query", MapType(StringType,StringType,true), true)
+  ))
 
 	val customerSalesSchema = StructType(Seq(
 			StructField("Customer", IntegerType, true),
