@@ -28,8 +28,8 @@ object LeisureFiltering {
   )
 
   def filter(df: DataFrame): DataFrame = {
-    val dfValueable = getRelevantInformation(df)
-    val dfLeisureScores = getLeisureScores(dfValueable, dfValueable.schema)
+    val dfValuable = getRelevantInformation(df)
+    val dfLeisureScores = getLeisureScores(dfValuable, dfValuable.schema)
     val dfLeisureFiltered = dfLeisureScores.filter(col("leisure_score")<=0.5).drop(col("leisure_scores"))
     dfLeisureFiltered
   }
@@ -54,8 +54,8 @@ object LeisureFiltering {
 
     val monthIdx = schema.fieldIndex("month")
     val yearIdx = schema.fieldIndex("year")
-    val bfoIdx = schema.fieldIndex("BFO")
-    val bfdIdx = schema.fieldIndex("BFD")
+    val BFOIdx = schema.fieldIndex("BFO")
+    val BFDIdx = schema.fieldIndex("BFD")
     val sessionIdx = schema.fieldIndex("session_guid")
     val rddRowWithScores = df.map(row => {
       val scores = mapScores.map( keyValue => {
@@ -64,8 +64,8 @@ object LeisureFiltering {
         val rowValue = row.get(row.schema.fieldIndex(key))
         createLeisureScoreFor(key, rowValue, scoresMap)}).toList
       Row(
-        row.getString(bfoIdx),
-        row.getString(bfdIdx),
+        row.getString(BFOIdx),
+        row.getString(BFDIdx),
         row.getInt(yearIdx),
         row.getInt(monthIdx),
         row.getString(sessionIdx),
@@ -87,8 +87,8 @@ object LeisureFiltering {
   }
 
   val leisureResultSchema = StructType(Seq(
-    StructField("bfo", StringType, true),
-    StructField("bfd", StringType, true),
+    StructField("BFO", StringType, true),
+    StructField("BFD", StringType, true),
     StructField("year", IntegerType, true),
     StructField("month", IntegerType, true),
     StructField("session_guid", StringType, true),

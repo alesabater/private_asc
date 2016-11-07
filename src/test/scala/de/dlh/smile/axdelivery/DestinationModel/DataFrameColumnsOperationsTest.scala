@@ -20,11 +20,10 @@ class DataFrameColumnsOperationsTest extends FlatSpec with Matchers {
   "udfGetDayOfTheWeek" should "get the specified segment of the date from a String date" in {
     val df = Stub.dfFullStringDate
     val dfResult = df.withColumn("date", udfGetDayOfTheWeek(col("date"), lit("yyyy-MM-dd HH:mm:ss.S")))
-    dfResult.show()
     dfResult.count should equal(4)
     dfResult.filter(col("date").isNotNull).count should equal(2)
-    dfResult.take(1)(0).getInt(0) should equal(2)
-    dfResult.take(2)(1).getInt(0) should equal(1)
+    dfResult.take(1)(0).getInt(0) should equal(7)
+    dfResult.take(2)(1).getInt(0) should equal(7)
   }
 
   "udfGetHourOfDay" should "get the specified segment of the date from a String date" in {
@@ -32,8 +31,8 @@ class DataFrameColumnsOperationsTest extends FlatSpec with Matchers {
     val dfResult = df.withColumn("date", udfGetHourOfDay(col("date"), lit("yyyy-MM-dd HH:mm:ss.S")))
     dfResult.count should equal(4)
     dfResult.filter(col("date").isNotNull).count should equal(2)
-    dfResult.take(1)(0).getInt(0) should equal(7)
-    dfResult.take(2)(1).getInt(0) should equal(11)
+    dfResult.take(1)(0).getInt(0) should equal(5)
+    dfResult.take(2)(1).getInt(0) should equal(5)
   }
 
   "getFirstIATA" should "get the first IATA code from the IATA string" in {
@@ -58,7 +57,8 @@ class DataFrameColumnsOperationsTest extends FlatSpec with Matchers {
   "udfGetDurationStay" should "turn the hour of the day into the time of the day" in {
     val df = Stub.dfOneColString
     val dfResult = df.withColumn("two", udfGetDurationStay(col("one")))
-    dfResult.show
+    dfResult.select("two").collect() should equal(Array(Row("1d"),Row("1-2w"),Row("1-2w"),Row("3-4w"),Row("3-4w"),
+      Row("3-4w"),Row(">4w"),Row("Other"),Row("Other")))
   }
 
   "udfGetBrowserName" should "Get the browser client name" in {
@@ -90,6 +90,16 @@ class DataFrameColumnsOperationsTest extends FlatSpec with Matchers {
     dfResult.filter(col("two")==="Google").count should equal(1)
   }
 
+  "udfGetBftType" should "should be a dataframe column UDF" in {
+    val df = Stub.dfBftType
+    val dfResult = df.withColumn("two", udfGetBftType(col("one")))
+
+    dfResult.select("two").collect() should equal(Array(Row("IK"),Row("K"),Row("IK"),Row("Other")))
+  }
+
+
+
+
   "udfGetLangauge" should "get the language" in {
     val df = Stub.dfLanguage
     val dfResult = df.withColumn("two", udfGetLanguage(col("one")))
@@ -99,10 +109,10 @@ class DataFrameColumnsOperationsTest extends FlatSpec with Matchers {
     dfResult.filter(col("two")==="Other").count should equal(3)
   }
 
-  "print training data" should "print dataframe" in {
-    val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/training").getPath)
-    df.limit(10).select("refdom").show
-  }
+//  "print training data" should "print dataframe" in {
+//    val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/training").getPath)
+//    df.limit(10).select("refdom").show
+//  }
 
 
 }

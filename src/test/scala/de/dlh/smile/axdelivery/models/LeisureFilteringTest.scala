@@ -85,21 +85,19 @@ class LeisureFilteringTest extends FlatSpec with Matchers {
     result4.getString(10) should equal("Deutsch")
     result4.getString(11) should equal("K")
     result4.getString(12) should equal("0")
-
-    df.show()
-    df.printSchema()
-    dfResult.show()
-    dfResult.printSchema()
   }
 
   "getLeisureScores" should "get all the scores for each column" in {
     val df = Stub.dfWebtrendsRelevantInfo
     val dfResult = LeisureFiltering.getLeisureScores(df, df.schema)
-    dfResult.columns should equal(List("bfo","bfd","year","month","session_guid","leisure_score"))
+    dfResult.show()
+    dfResult.columns should equal(List("BFO","BFD","year","month","session_guid","leisure_score"))
     dfResult.count() should equal(6)
-    //results(0).getDouble(0)*1000/1000 should equal(-0.964367 + 34*0.008061 + -0.24329 + 0.0 + 1.345292 + 1.201469 + 5.560091458 + -0.281493421 - 0.979952029 + 0.394189713 + 0.215854591 - 0.614505492)
   }
 
   "filter" should "filter leisure scores greater than 0.5" in {
+    val df = Stub.dfWebtrendsFormatted
+    val dfResult = LeisureFiltering.filter(df)
+    dfResult.count should equal(0)
   }
 }

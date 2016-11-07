@@ -13,15 +13,16 @@ object Main {
     execute(new IO())
   }
 
-  def execute(io: IO): Unit = {
+  def execute(io: IO): DataFrame = {
     val dfWebtrends = io.readWebtrendsData
     val dfAirportCity = io.readAirportCityMapping
     val dfWebtrendsFormatted = Transformations.formatWebtrendsData(dfWebtrends, dfAirportCity)
     val dfFilteredByLeisure = LeisureFiltering.filter(dfWebtrendsFormatted)
-    val dfResult =
-      if (dfFilteredByLeisure.count() > 0) DestinationRecommender.recommend(dfFilteredByLeisure)
-      else Contexts.sqlCtx.emptyDataFrame
-    io.writeSearchModelResult(dfResult)
+    dfFilteredByLeisure
+//    val dfResult =
+//      if (dfFilteredByLeisure.count() > 0) DestinationRecommender.recommend(dfFilteredByLeisure)
+//      else Contexts.sqlCtx.emptyDataFrame
+//    io.writeSearchModelResult(dfResult)
   }
 }
 

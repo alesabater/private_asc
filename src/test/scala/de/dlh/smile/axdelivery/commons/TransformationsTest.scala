@@ -10,18 +10,10 @@ class TransformationsTest extends FlatSpec with Matchers {
   
   "formatWebtrendsData" should "format and register data frame" in {
     val df = Contexts.sqlCtx.read.parquet(getClass.getResource("/data/webtrends").getPath)
-    val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airport_codes/airporttocity.json").getPath)
+    val dfAirportMap = Contexts.sqlCtx.read.json(getClass.getResource("/data/airporttocity.json").getPath)
     val dfResult = Transformations.formatWebtrendsData(df, dfAirportMap)
     dfResult.show()
   }
-
-	"scoreTravelReason" should "return the dataFrame with an extra column called scoreTRM" in {
-	  val df = Stub.dfWebtendsAfterFormat
-    //val dfResult = Transformations.scoreTravelReason(df)
-    df.show()
-    df.printSchema()
-    // At this moment we have to believe that it is correct
-	}
 
 	"createDateFrom" should "get the day of the week out of a string date" in {
     val valid = createDateFrom("20160928", "yyyyMMdd")(_.toString("MM"))

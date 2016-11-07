@@ -57,7 +57,12 @@ case class DataFrameUpdatable(df: DataFrame) extends Logging{
   }
 
   def airportToCityCode(dfAirportMap: DataFrame, colName: String): DataFrame = {
-    df.join(dfAirportMap, df(colName) === dfAirportMap("Airport"), "left").drop("Airport").drop(colName).withColumnRenamed("City", colName)
+    df.join(dfAirportMap, df(colName) === dfAirportMap("Airport"), "left")
+      .withColumn("tmp", coalesce(col("City"),col(colName)))
+      .drop(colName)
+      .drop("Airport")
+      .drop("City")
+      .withColumnRenamed("tmp", colName)
   }
 
   def filterOrigin(): DataFrame = {
@@ -73,5 +78,10 @@ case class DataFrameUpdatable(df: DataFrame) extends Logging{
 
   def filterPartitionFieldsOneMonth(year: Int = DateTime.now.getYear, month: Int = DateTime.now.getMonthOfYear): DataFrameUpdatable = {
     df.filter(col("year") === year and col("month") === month)
+  }
+
+  def groupByDistinctColumn(distinctCol: String, groupByCols: String*): DataFrameUpdatable = {
+    df.groupBy(groupByCols.map(col(_)): _*)
+      .agg(countDistinct(distinctCol).alias("freq"))
   }
 }
